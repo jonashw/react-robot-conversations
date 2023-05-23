@@ -1,8 +1,40 @@
 [
   {
-    "voices": ["Brian"],
+    "type": "conversation",
+    "voices": {
+      "b": "Brian",
+      "m": "Matthew"
+    },
+    "utterances": [
+      ["b", "Hello Matthew,  How are you today?"],
+      ["m", "Hi Brian,  I am so angry right now."],
+      ["b", "Oh dear,  I hope it isn't more trouble with the police."],
+      ["m", "unfortunately yes, they want me to make them a sandwich."],
+      [
+        "b",
+        "well then, be sure to put extra mayonnaise on it, will you?  Police go mad for mayo."
+      ],
+      ["m", "bet, there will be even more mayo than bread"],
+      ["b", "hahahaha"]
+    ]
+  },
+  {
+    "type": "board",
+    "voices": ["Brian", "Matthew"],
     "domain": {
       "British English": [
+        "yes, of course.",
+        "no, I don't think so.",
+        "I'll huff and I'll puff",
+        "oh dear.",
+        "I wouldn't do that, if I were you",
+        "something smells stinky",
+        "hey now, please stop eating my spaghetti",
+        "let go! You are going to break it",
+        "go home and eat oatmeal with your papa",
+        "you'd better wash your hands"
+      ],
+      "US English": [
         "yes, of course.",
         "no, I don't think so.",
         "I'll huff and I'll puff",
@@ -17,6 +49,7 @@
     }
   },
   {
+    "type": "board",
     "voices": ["Ivy", "Justin", "Salli", "Matthew"],
     "domain": {
       "US English": [
@@ -32,6 +65,7 @@
     }
   },
   {
+    "type": "board",
     "domain": {
       "US English": [
         "hi",
