@@ -39,7 +39,6 @@ export type VoiceLangUtterances = { [voice: string]: LangUtterances };
 export type Conversation = {
   id: number;
   type: "conversation";
-  utterances: Utterance[];
   utteranceMoments: UtteranceMoment[];
   voices: { [abbrev: string]: string };
 };

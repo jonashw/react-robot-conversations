@@ -18,7 +18,6 @@ export default (
 ): VoiceBoard => {
   switch (vbs.type) {
     case "script":
-      let utts: Utterance[] = []; //vbs.script.split(\n);
       let utteranceMoments: UtteranceMoment[] = vbs.script
         .split("\n")
         .map((line) => {
@@ -92,40 +91,11 @@ export default (
 
       return {
         id,
-        utterances: utts,
         voices: vbs.voices,
         type: "conversation",
         utteranceMoments,
       };
     case "conversation":
-      let utterances: Utterance[] = [];
-      utterances = vbs.utterances.map(([v, msg]) => {
-        let voice = vbs.voices[v];
-        let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${voice}&msg=${msg}`;
-        let a = new Audio(url);
-        return {
-          label: msg,
-          voice,
-          audio: a,
-          stop: () => {
-            a.pause();
-            a.currentTime = 0;
-          },
-          play: (self: Utterance) => {
-            a.load();
-            a.play();
-            setActiveUtterance(self);
-          },
-        };
-      });
-      for (let i = 0; i < utterances.length - 1; i++) {
-        console.log(`adding listener on ${i} for ${i + 1}`);
-        utterances[i].audio.addEventListener("ended", () => {
-          console.log("ended");
-          let nextU = utterances[i + 1];
-          nextU.play(nextU);
-        });
-      }
       let utteranceMomentss: UtteranceMoment[] = vbs.utterances.map(
         ([v, msg]) => {
           let voice = vbs.voices[v];
@@ -175,7 +145,6 @@ export default (
       }
       return {
         id,
-        utterances,
         voices: vbs.voices,
         utteranceMoments: utteranceMomentss,
         type: vbs.type,

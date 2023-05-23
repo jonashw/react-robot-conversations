@@ -30,14 +30,16 @@ export default ({
   const [activeVoice, setActiveVoice] = React.useState<Voice | null>(null);
   React.useEffect(() => {
     setActiveVoice(null);
-    let voiceNames = Object.keys(voiceBoard.utterances);
-    if (voiceNames.length === 0) {
-      return;
+    if (voiceBoard.type === "board") {
+      let voiceNames = Object.keys(voiceBoard.utterances);
+      if (voiceNames.length === 0) {
+        return;
+      }
+      if (!(voiceNames[0] in voices)) {
+        return;
+      }
+      setActiveVoice(voices[voiceNames[0]]);
     }
-    if (!(voiceNames[0] in voices)) {
-      return;
-    }
-    setActiveVoice(voices[voiceNames[0]]);
   }, [voiceBoard, voices]);
   return (
     <div>
@@ -98,45 +100,6 @@ export default ({
                     ))}
                   </tbody>
                 </table>
-                {vb.utterances.map((u, i) => (
-                  <div style={{ clear: "both" }}>
-                    <span
-                      className="btn btn-lg"
-                      style={{
-                        float: i % 2 !== 0 ? "left" : "right",
-                        textAlign: i % 2 !== 0 ? "left" : "right",
-                      }}
-                    >
-                      {u.voice}
-                    </span>
-                    <button
-                      className={
-                        "btn btn-lg " +
-                        (activeUtterance === u
-                          ? "btn-primary"
-                          : "btn-outline-primary")
-                      }
-                      style={{
-                        display: "inline-block",
-                        margin: "1%",
-                        width: "66%",
-                        float: i % 2 === 0 ? "left" : "right",
-                        textAlign: i % 2 === 0 ? "left" : "right",
-                      }}
-                      onClick={(e) => {
-                        e.currentTarget.blur();
-
-                        if (preventUtteranceOverlap && !!activeUtterance) {
-                          activeUtterance.stop();
-                        }
-                        u.play(u);
-                        setActiveUtterance(u);
-                      }}
-                    >
-                      {u.label}
-                    </button>
-                  </div>
-                ))}
               </div>
             );
           case "board":
