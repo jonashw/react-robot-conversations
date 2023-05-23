@@ -46,9 +46,9 @@ const loadVoiceBoard = (id: number, vbs: VoiceBoardSpec): VoiceBoard => {
               play: () => {
                 a.load();
                 a.play();
-              }
+              },
             };
-          })
+          }),
         ])
       );
       return [voice, uts];
@@ -57,14 +57,14 @@ const loadVoiceBoard = (id: number, vbs: VoiceBoardSpec): VoiceBoard => {
 
   return {
     id,
-    utterances
+    utterances,
   };
 };
 
 const VoiceBoardControls = ({
   voices,
   voiceBoard,
-  preventUtteranceOverlap
+  preventUtteranceOverlap,
 }: {
   voices: VoiceIndex;
   voiceBoard: VoiceBoard;
@@ -96,10 +96,14 @@ const VoiceBoardControls = ({
               onClick={() => setActiveVoice(voices[voice])}
             >
               <td>{voice}</td>
-              {["age", "gender", "lang"].map((key) => (
+              {[
+                (v: Voice) => v.age,
+                (v: Voice) => v.gender,
+                (v: Voice) => v.lang,
+              ].map((key) => (
                 <td>
                   <span className="badge text-bg-secondary">
-                    {voices[voice][key]}
+                    {key(voices[voice])}
                   </span>
                 </td>
               ))}
@@ -144,14 +148,11 @@ const VoiceBoardControls = ({
 };
 
 export default function App() {
-  const [preventUtteranceOverlap, setPreventUtteranceOverlap] = React.useState(
-    true
-  );
+  const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
+    React.useState(true);
   const [voices, setVoices] = React.useState<VoiceIndex>({});
-  const [
-    activeVoiceBoard,
-    setActiveVoiceBoard
-  ] = React.useState<VoiceBoard | null>(null);
+  const [activeVoiceBoard, setActiveVoiceBoard] =
+    React.useState<VoiceBoard | null>(null);
 
   const [voiceBoardSpecs, setVoiceBoardSpecs] = React.useState<
     VoiceBoardSpec[]
@@ -184,7 +185,7 @@ export default function App() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-around",
-          marginTop: "1em"
+          marginTop: "1em",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-around" }}>
