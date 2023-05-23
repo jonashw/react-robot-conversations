@@ -2,11 +2,11 @@
   {
     "type": "script",
     "voices": {
-      "p": "Matthew",
+      "p": "Brian",
       "s": "Justin",
       "f": "Ivy"
     },
-    "script": "p:Hello kids!\ns:Hello|f:Hello\np:Should we go bounce together on the trampoline?\ns:I'm going to bounce super high\nf:me too!\np:yay|s:yay|f:yay\np:boing|s:boing|f:boing\nf:boing\np:boing|s:boing\nf:boing\ns:boing\np:boing|s:boing|f:boing"
+    "script": "p:hello puppies!\ns:Hello|f:Hello\np:Should we go bounce together on the trampoline?\ns:I'm going to bounce super high\nf:let's bounce into the clouds!\np:hooray|s:hooray|f:hooray\np:boing|s:boing|f:boing\nf:boing\np:boing|s:boing\nf:boing\ns:boing\np:boing|s:boing|f:boing\np:this makes me so tired"
   },
   {
     "type": "conversation",
