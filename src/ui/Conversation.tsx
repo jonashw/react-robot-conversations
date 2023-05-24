@@ -28,11 +28,48 @@ export default ({
           <tr>
             {Object.entries(conversation.characters).map(([c, character]) => (
               <th
-                style={{ width: Math.floor(100 / 3) + "%" }}
+                style={{
+                  width:
+                    Math.floor(
+                      100 / Object.entries(conversation.characters).length
+                    ) + "%",
+                }}
                 key={character.name}
               >
-                {character.name}
-                <br />({character.voice})
+                <input
+                  type="text"
+                  value={character.name}
+                  className="form-control"
+                  style={{ textAlign: "center" }}
+                />
+              </th>
+            ))}
+            <th>
+              <button className="btn" onClick={() => alert("not implemented")}>
+                +
+              </button>
+            </th>
+          </tr>
+          <tr>
+            {Object.entries(conversation.characters).map(([c, character]) => (
+              <th key={character.name} style={{ fontWeight: "normal" }}>
+                <input
+                  type="text"
+                  value={character.emoji}
+                  className="form-control form-control-lg"
+                  style={{
+                    textAlign: "center",
+                    fontSize: "calc(1.375rem + 1.5vw)",
+                  }}
+                />
+              </th>
+            ))}
+            <th>&nbsp;</th>
+          </tr>
+          <tr>
+            {Object.entries(conversation.characters).map(([c, character]) => (
+              <th key={character.name} style={{ fontWeight: "normal" }}>
+                {character.voice}
               </th>
             ))}
             <th>&nbsp;</th>
@@ -40,33 +77,24 @@ export default ({
         </thead>
         <tbody>
           {conversation.utteranceMoments.map((moment, mi) => (
-            <tr key={mi}>
+            <tr
+              key={mi}
+              className={
+                activeUtteranceMoment === moment ? "table-primary" : ""
+              }
+            >
               {voiceAbbrevs.map((v) =>
                 v in moment.utteranceByVoice ? (
                   <td key={v}>
-                    <div className="d-grid">
-                      <button
-                        className={
-                          "btn btn-lg " +
-                          (activeUtteranceMoment === moment
-                            ? "btn-primary"
-                            : "btn-outline-primary")
-                        }
-                        onClick={(e) => {
-                          e.currentTarget.blur();
-                          if (
-                            preventUtteranceOverlap &&
-                            !!activeUtteranceMoment
-                          ) {
-                            activeUtteranceMoment.stop(activeUtteranceMoment);
-                          }
-
-                          moment.play(moment);
-                          setActiveUtteranceMoment(moment);
-                        }}
-                      >
-                        {moment.utteranceByVoice[v].label}
-                      </button>
+                    <div
+                      className="text-align-center text-muted"
+                      style={{ fontSize: "0.75em" }}
+                    >
+                      <textarea
+                        value={moment.utteranceByVoice[v].label}
+                        rows={3}
+                        className="form-control form-control-sm"
+                      />
                     </div>
                   </td>
                 ) : (

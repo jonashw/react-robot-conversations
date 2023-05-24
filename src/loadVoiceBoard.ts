@@ -1,9 +1,6 @@
-import { unmountComponentAtNode } from "react-dom";
 import {
-  Voice,
   VoiceBoardSpec,
   VoiceBoard,
-  VoiceIndex,
   VoiceLangUtterances,
   Utterance,
   UtteranceMoment,
