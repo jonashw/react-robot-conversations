@@ -26,7 +26,7 @@ export default ({
               </div>
               {activeUtteranceMoment !== undefined &&
                 v in activeUtteranceMoment.utteranceByVoice && (
-                  <div className="alert alert-primary">
+                  <div className="alert alert-primary mt-3">
                     {activeUtteranceMoment.utteranceByVoice[v].label}
                   </div>
                 )}

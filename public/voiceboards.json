@@ -8,8 +8,8 @@
         "emoji": "🐄"
       },
       "dog": {
-        "name": "Doggy",
-        "voice": "Brian",
+        "name": "Mr. Dog",
+        "voice": "Justin",
         "emoji": "🐕"
       },
       "cat": {
@@ -24,7 +24,7 @@
       },
       "rooster": {
         "name": "Mr. Rooster",
-        "voice": "Justin",
+        "voice": "Brian",
         "emoji": "🐓"
       }
     },
@@ -35,8 +35,8 @@
       { "pig": "oink" },
       { "rooster": "cockle-doodle-doo" },
       { "cow": "moo.  who is going to wash the dishes?" },
-      { "dog": "bark.  not me" },
-      { "cat": "meow. not me!" },
+      { "dog": "bark.  not me.  I didn't use any" },
+      { "cat": "meow. not me either!" },
       { "pig": "oink.  I think it should be {rooster}" },
       { "rooster": "cockle-doodle-doo" },
       { "cow": "moo. Oh dear. {rooster} doesn't even know what's going on." }
@@ -77,27 +77,29 @@
     ]
   },
   {
-    "type": "conversation",
-
-    "voices": {
-      "b": "Brian",
-      "m": "Matthew"
+    "type": "script",
+    "characters": {
+      "b": {
+        "name": "Mr. Taco",
+        "voice": "Brian",
+        "emoji": "🧔"
+      },
+      "m": {
+        "name": "Jeffrey",
+        "voice": "Matthew",
+        "emoji": "👨"
+      }
     },
-    "emojis": {
-      "b": "🧔",
-      "m": "👨"
-    },
-    "utterances": [
-      ["b", "Hello Matthew,  How are you today?"],
-      ["m", "Hi Brian,  I am so angry right now."],
-      ["b", "Oh dear,  I hope it isn't more trouble with the police."],
-      ["m", "unfortunately it is! they want me to make them a sandwich."],
-      [
-        "b",
-        "well then, be sure to put extra mayonnaise on it, will you?  Police go mad for mayo."
-      ],
-      ["m", "bet, there will be even more mayo than bread"],
-      ["b", "hahahaha"]
+    "script": [
+      { "b": "Hello {m},  How are you today?" },
+      { "m": "Hi {b},  I am so angry right now." },
+      { "b": "Oh dear,  I hope it isn't more trouble with the police." },
+      { "m": "unfortunately, it is! they want me to make them a sandwich." },
+      {
+        "b": "well then, be sure to put extra mayonnaise on it, will you?  Police go mad for mayo."
+      },
+      { "m": "bet, there will be even more mayo than bread" },
+      { "b": "hahahaha" }
     ]
   },
   {

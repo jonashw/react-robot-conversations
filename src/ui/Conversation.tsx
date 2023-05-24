@@ -26,9 +26,13 @@ export default ({
       <table className="table">
         <thead>
           <tr>
-            {Object.values(conversation.characters).map((c) => (
-              <th style={{ width: Math.floor(100 / 3) + "%" }} key={c.voice}>
-                {c.name}
+            {Object.entries(conversation.characters).map(([c, character]) => (
+              <th
+                style={{ width: Math.floor(100 / 3) + "%" }}
+                key={character.name}
+              >
+                {character.name}
+                <br />({character.voice})
               </th>
             ))}
             <th>&nbsp;</th>
