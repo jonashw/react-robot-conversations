@@ -10,77 +10,98 @@ import {
   UtteranceByVoice,
 } from "./Model";
 
-export default (
+const convert = (
   id: number,
   vbs: VoiceBoardSpec,
-  setActiveUtterance: (u: Utterance) => void,
-  setActiveUtteranceMoment: (um: UtteranceMoment) => void
+  setActiveUtterance: (u: Utterance | undefined) => void,
+  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
 ): VoiceBoard => {
   switch (vbs.type) {
     case "script":
-      let utteranceMoments: UtteranceMoment[] = vbs.script
-        .split("\n")
-        .map((line) => {
-          let utteranceByVoice: UtteranceByVoice = Object.fromEntries(
-            line
-              .split("|")
-              .map((u) => {
-                let [v, msg] = u.split(":");
-                let voice = vbs.voices[v];
-                console.log({ line, v, msg, voice });
-                let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${voice}&msg=${msg}`;
-                let a = new Audio(url);
-                let utt: Utterance = {
-                  label: msg,
-                  voice,
-                  audio: a,
-                  stop: () => {
-                    a.pause();
-                    a.currentTime = 0;
-                  },
-                  play: (self: Utterance) => {
-                    a.load();
-                    a.play();
-                    setActiveUtterance(self);
-                  },
-                };
-                return [v, utt];
-              })
-              .filter((u) => !!u)
+      const interpolateCharacterNamesInMessage: (msg: string) => string =
+        (() => {
+          let replacementFns = Object.entries(vbs.characters).map(
+            ([c, character]) =>
+              (msg: string) =>
+                msg.replace(`{${c}}`, character.name)
           );
-          let endObservers: (() => void)[] = [];
-          return {
-            utteranceByVoice,
-            onEnd: (observer: () => void) => endObservers.push(observer),
-            stop: (um: UtteranceMoment) => {
-              let us = Object.values(um.utteranceByVoice);
-              for (let u of us) {
-                u.audio.pause();
-                u.audio.currentTime = 0;
+          return (msg: string) =>
+            replacementFns.reduce((msg, replace) => replace(msg), msg);
+        })();
+      let utteranceMoments: UtteranceMoment[] = vbs.script.map((moment) => {
+        let utteranceByVoice: UtteranceByVoice = Object.fromEntries(
+          Object.entries(moment)
+            .map(([v, msg]) => {
+              if (!(v in vbs.characters)) {
+                return undefined;
               }
-            },
-            play: (um: UtteranceMoment) => {
-              setActiveUtteranceMoment(um);
-              let us = Object.values(um.utteranceByVoice);
-              let ended = [];
-              for (let u of us) {
-                const listener = () => {
-                  console.log("ended");
-                  u.audio.removeEventListener("ended", listener);
-                  ended.push(u);
-                  if (ended.length === us.length) {
-                    for (let o of endObservers) {
-                      o();
-                    }
+              let character = vbs.characters[v];
+              //console.log({ line, v, msg, voice });
+              let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${
+                character.voice
+              }&msg=${interpolateCharacterNamesInMessage(msg)}`;
+              let a = new Audio(url);
+              let utt: Utterance = {
+                label: interpolateCharacterNamesInMessage(msg),
+                voice: character.voice,
+                audio: a,
+                stop: () => {
+                  a.pause();
+                  a.currentTime = 0;
+                  setActiveUtterance(undefined);
+                },
+                play: (self: Utterance) => {
+                  a.load();
+                  a.play();
+                  setActiveUtterance(self);
+                },
+              };
+              return [v, utt] as [string, Utterance];
+            })
+            .filter((u) => u !== undefined)
+            .map((u) => u as [string, Utterance])
+        );
+        let endObservers: (() => void)[] = [
+          () => {
+            //console.log("ended: " + line);
+          },
+        ];
+        return {
+          utteranceByVoice,
+          onEnd: (observer: () => void) => endObservers.push(observer),
+          stop: (um: UtteranceMoment) => {
+            setActiveUtteranceMoment(undefined);
+            let us = Object.values(um.utteranceByVoice);
+            for (let u of us) {
+              u.audio.pause();
+              u.audio.currentTime = 0;
+            }
+          },
+          play: (um: UtteranceMoment) => {
+            //console.log("started: " + line);
+            setActiveUtteranceMoment(um);
+            let us = Object.values(um.utteranceByVoice);
+            let ended = [];
+            for (let u of us) {
+              const listener = () => {
+                console.log("ended");
+                u.audio.removeEventListener("ended", listener);
+                ended.push(u);
+                if (ended.length === us.length) {
+                  setActiveUtteranceMoment(undefined);
+                  for (let o of endObservers) {
+                    o();
                   }
-                };
-                u.audio.addEventListener("ended", listener);
-                u.audio.load();
-                u.audio.play();
-              }
-            },
-          };
-        });
+                }
+              };
+
+              u.audio.addEventListener("ended", listener);
+              u.audio.load();
+              u.audio.play();
+            }
+          },
+        };
+      });
 
       for (let i = 0; i < utteranceMoments.length - 1; i++) {
         console.log(`adding listener on ${i} for ${i + 1}`);
@@ -91,26 +112,32 @@ export default (
 
       return {
         id,
-        voices: vbs.voices,
+        characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
+        play: () => {
+          alert("not implemented");
+        },
+        stop: () => {
+          alert("not implemented");
+        },
       };
     case "conversation":
       let utteranceMomentss: UtteranceMoment[] = vbs.utterances.map(
         ([v, msg]) => {
-          let voice = vbs.voices[v];
-          let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${voice}&msg=${msg}`;
+          let character = vbs.characters[v];
+          let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${character.voice}&msg=${msg}`;
           let a = new Audio(url);
           let utt = {
             label: msg,
-            voice,
+            voice: character.voice,
             audio: a,
             stop: () => {
               a.pause();
               a.currentTime = 0;
             },
             play: (self: Utterance) => {
-              a.load();
+              a.currentTime = 0;
               a.play();
               setActiveUtterance(self);
             },
@@ -128,6 +155,7 @@ export default (
             },
             stop: (um: UtteranceMoment) => {
               utt.stop();
+              setActiveUtteranceMoment(undefined);
             },
             onEnd: (ob: () => void) => {
               endObservers.push(ob);
@@ -143,11 +171,20 @@ export default (
         let nextUm = utteranceMomentss[i + 1];
         um.onEnd(() => nextUm.play(nextUm));
       }
+      utteranceMomentss[utteranceMomentss.length - 1].onEnd(() => {
+        setActiveUtteranceMoment(undefined);
+      });
       return {
         id,
-        voices: vbs.voices,
+        characters: vbs.characters,
         utteranceMoments: utteranceMomentss,
-        type: vbs.type,
+        type: "conversation",
+        play: () => {
+          alert("not implemented");
+        },
+        stop: () => {
+          alert("not implemented");
+        },
       };
     case "board":
       let boardUtterances: VoiceLangUtterances = Object.fromEntries(
@@ -167,7 +204,7 @@ export default (
                     a.currentTime = 0;
                   },
                   play: () => {
-                    a.load();
+                    a.currentTime = 0;
                     a.play();
                   },
                 };
@@ -185,4 +222,22 @@ export default (
         type: "board",
       };
   }
+};
+
+const cache: { [id: number]: VoiceBoard } = {};
+
+export default (
+  id: number,
+  vbs: VoiceBoardSpec,
+  setActiveUtterance: (u: Utterance | undefined) => void,
+  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
+): VoiceBoard => {
+  console.log("getting " + id + " from cache", cache);
+  if (id in cache) {
+    return cache[id];
+  }
+  let sketch = convert(id, vbs, setActiveUtterance, setActiveUtteranceMoment);
+  cache[id] = sketch;
+
+  return sketch;
 };

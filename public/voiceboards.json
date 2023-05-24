@@ -1,18 +1,91 @@
 [
   {
     "type": "script",
-    "voices": {
-      "p": "Brian",
-      "s": "Justin",
-      "f": "Ivy"
+    "characters": {
+      "cow": {
+        "name": "Mrs. Cow",
+        "voice": "Amy",
+        "emoji": "🐄"
+      },
+      "dog": {
+        "name": "Doggy",
+        "voice": "Brian",
+        "emoji": "🐕"
+      },
+      "cat": {
+        "name": "Ms. Kitty",
+        "voice": "Ivy",
+        "emoji": "🐈"
+      },
+      "pig": {
+        "name": "Mr. Pig",
+        "voice": "Miguel",
+        "emoji": "🐖"
+      },
+      "rooster": {
+        "name": "Mr. Rooster",
+        "voice": "Justin",
+        "emoji": "🐓"
+      }
     },
-    "script": "p:hello puppies!\ns:Hello|f:Hello\np:Should we go bounce together on the trampoline?\ns:I'm going to bounce super high\nf:let's bounce into the clouds!\np:hooray|s:hooray|f:hooray\np:boing|s:boing|f:boing\nf:boing\np:boing|s:boing\nf:boing\ns:boing\np:boing|s:boing|f:boing\np:this makes me so tired"
+    "script": [
+      { "cow": "moo" },
+      { "dog": "bark" },
+      { "cat": "meow" },
+      { "pig": "oink" },
+      { "rooster": "cockle-doodle-doo" },
+      { "cow": "moo.  who is going to wash the dishes?" },
+      { "dog": "bark.  not me" },
+      { "cat": "meow. not me!" },
+      { "pig": "oink.  I think it should be {rooster}" },
+      { "rooster": "cockle-doodle-doo" },
+      { "cow": "moo. Oh dear. {rooster} doesn't even know what's going on." }
+    ]
+  },
+  {
+    "type": "script",
+    "characters": {
+      "p": {
+        "name": "Papa",
+        "emoji": "👨",
+        "voice": "Brian"
+      },
+      "s": {
+        "name": "Sawyer",
+        "emoji": "👦",
+        "voice": "Justin"
+      },
+      "f": {
+        "name": "Fiona",
+        "emoji": "👧",
+        "voice": "Ivy"
+      }
+    },
+    "script": [
+      { "p": "Hello puppies!" },
+      { "f": "Hello", "s": "Hello" },
+      { "p": "Should we go bounce together on the trampoline?" },
+      { "s": "Yes,I'm going to bounce super high" },
+      { "f": "Yes,I'm going to bounce into the clouds!" },
+      { "p": "boing", "s": "boing", "f": "boing" },
+      { "f": "boing" },
+      { "p": "boing", "s": "boing" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "p": "boing", "s": "boing", "f": "boing" },
+      { "p": "this makes me so tired" }
+    ]
   },
   {
     "type": "conversation",
+
     "voices": {
       "b": "Brian",
       "m": "Matthew"
+    },
+    "emojis": {
+      "b": "🧔",
+      "m": "👨"
     },
     "utterances": [
       ["b", "Hello Matthew,  How are you today?"],
