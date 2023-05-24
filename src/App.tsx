@@ -54,7 +54,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className="App container">
       <div
         style={{
           display: "flex",
@@ -63,7 +63,7 @@ export default function App() {
           marginTop: "1em",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           {voiceBoardSpecs.map((spec, i) => (
             <button
               key={i}

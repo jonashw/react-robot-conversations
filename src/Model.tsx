@@ -15,14 +15,19 @@ export type VoiceBoardSpec =
     }
   | {
       type: "conversation";
-      voices: { [abbrev: string]: string };
       utterances: [string, string][];
+      characters: {
+        [abbrev: string]: Character;
+      };
     }
   | {
       type: "script";
-      voices: { [abbrev: string]: string };
-      script: string;
+      script: { [abbrev: string]: string }[];
+      characters: {
+        [abbrev: string]: Character;
+      };
     };
+export type Character = { name: string; emoji?: string; voice: string };
 export type Toolbox = {
   id: number;
   type: "board";
@@ -38,7 +43,11 @@ export type Conversation = {
   id: number;
   type: "conversation";
   utteranceMoments: UtteranceMoment[];
-  voices: { [abbrev: string]: string };
+  characters: {
+    [abbrev: string]: Character;
+  };
+  play: () => void;
+  stop: () => void;
 };
 export type VoiceBoard = Toolbox | Conversation;
 

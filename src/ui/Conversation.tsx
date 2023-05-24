@@ -19,17 +19,19 @@ export default ({
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
 }) => {
   let preventUtteranceOverlap = true;
-  let voiceAbbrevs = Object.keys(conversation.voices);
+  let voiceAbbrevs = Object.keys(conversation.characters);
+  const [looping, setLooping] = React.useState<boolean>(false);
   return (
     <div>
       <table className="table">
         <thead>
           <tr>
-            {Object.values(conversation.voices).map((v) => (
-              <th style={{ width: Math.floor(100 / 3) + "%" }} key={v}>
-                {v}
+            {Object.values(conversation.characters).map((c) => (
+              <th style={{ width: Math.floor(100 / 3) + "%" }} key={c.voice}>
+                {c.name}
               </th>
             ))}
+            <th>&nbsp;</th>
           </tr>
         </thead>
         <tbody>
@@ -67,6 +69,17 @@ export default ({
                   <td key={v}></td>
                 )
               )}
+              <td>
+                {activeUtteranceMoment === moment ? (
+                  <button className="btn" onClick={() => moment.stop(moment)}>
+                    ⏹
+                  </button>
+                ) : (
+                  <button className="btn" onClick={() => moment.play(moment)}>
+                    ⏵
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

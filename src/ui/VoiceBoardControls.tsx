@@ -1,6 +1,8 @@
-import React from "react";
+import React, { DependencyList, EffectCallback } from "react";
 import Conversation from "./Conversation";
 import VoiceList from "./VoiceList";
+
+import Stage from "./Stage";
 import {
   Voice,
   VoiceBoardSpec,
@@ -9,6 +11,10 @@ import {
   Utterance,
   UtteranceMoment,
 } from "../Model";
+
+const reactTo = (deps: DependencyList, effect: EffectCallback) => {
+  React.useEffect(effect, deps);
+};
 
 export default ({
   voices,
@@ -32,7 +38,17 @@ export default ({
   const [activeVoice, setActiveVoice] = React.useState<Voice | undefined>(
     undefined
   );
-  React.useEffect(() => {
+
+  const [editing, setEditing] = React.useState<boolean>(false);
+
+  reactTo([voiceBoard], () => {
+    setEditing(false);
+    if (!!activeUtteranceMoment) {
+      activeUtteranceMoment.stop(activeUtteranceMoment);
+    }
+  });
+
+  reactTo([voiceBoard, voices], () => {
     setActiveVoice(undefined);
     if (voiceBoard.type === "board") {
       let voiceNames = Object.keys(voiceBoard.utterances);
@@ -44,21 +60,94 @@ export default ({
       }
       setActiveVoice(voices[voiceNames[0]]);
     }
-  }, [voiceBoard, voices]);
+  });
+
   return (
     <div>
       {(() => {
         switch (vb.type) {
           case "conversation":
-            let conversation = vb;
+            const conversation = vb;
+            const playing = !!activeUtteranceMoment;
+            const stopped = !playing;
+            const play = () => {
+              if (conversation.utteranceMoments.length > 0) {
+                let um = conversation.utteranceMoments[0];
+                um.play(um);
+              }
+            };
+            const stop = () => {
+              if (!!activeUtteranceMoment) {
+                activeUtteranceMoment.stop(activeUtteranceMoment);
+                setActiveUtteranceMoment(undefined);
+              }
+            };
             return (
-              <Conversation
-                {...{
-                  conversation,
-                  activeUtteranceMoment: activeUtteranceMoment,
-                  setActiveUtteranceMoment: setActiveUtteranceMoment,
-                }}
-              />
+              <>
+                <ul className="nav nav-tabs">
+                  {(
+                    [
+                      ["Viewing", !editing],
+                      ["Editing", editing],
+                    ] as [string, boolean][]
+                  ).map(([label, active]) => (
+                    <li className="nav-item">
+                      <a
+                        href="javascript:void(0)"
+                        onClick={() => setEditing(!editing)}
+                        className={"nav-link" + (active ? " active" : "")}
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                {!editing && (
+                  <>
+                    <div className="btn-group my-5">
+                      {(
+                        [
+                          [playing, play, "/icons/play.svg"],
+                          [stopped, stop, "/icons/stop.svg"],
+                        ] as [boolean, () => void, string][]
+                      ).map(([active, onClick, iconSrc]) => (
+                        <button
+                          disabled={active}
+                          className={
+                            "btn btn-lg " +
+                            (active
+                              ? "btn-primary active"
+                              : "btn-outline-primary")
+                          }
+                          onClick={onClick}
+                        >
+                          <img
+                            src={iconSrc}
+                            style={{
+                              height: "1em",
+                              filter: active ? "invert(1)" : "",
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <Stage
+                      characters={conversation.characters}
+                      activeUtteranceMoment={activeUtteranceMoment}
+                    />
+                  </>
+                )}
+                {editing && (
+                  <Conversation
+                    {...{
+                      conversation,
+                      activeUtteranceMoment: activeUtteranceMoment,
+                      setActiveUtteranceMoment: setActiveUtteranceMoment,
+                    }}
+                  />
+                )}
+              </>
             );
           case "board":
             return (
