@@ -10,7 +10,7 @@ import {
   UtteranceByVoice,
 } from "./Model";
 
-export default (
+const convert = (
   id: number,
   vbs: VoiceBoardSpec,
   setActiveUtterance: (u: Utterance | undefined) => void,
@@ -193,4 +193,22 @@ export default (
         type: "board",
       };
   }
+};
+
+const cache: { [id: number]: VoiceBoard } = {};
+
+export default (
+  id: number,
+  vbs: VoiceBoardSpec,
+  setActiveUtterance: (u: Utterance | undefined) => void,
+  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
+): VoiceBoard => {
+  console.log("getting " + id + " from cache", cache);
+  if (id in cache) {
+    return cache[id];
+  }
+  let sketch = convert(id, vbs, setActiveUtterance, setActiveUtteranceMoment);
+  cache[id] = sketch;
+
+  return sketch;
 };
