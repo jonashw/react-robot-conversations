@@ -13,8 +13,8 @@ import {
 export default (
   id: number,
   vbs: VoiceBoardSpec,
-  setActiveUtterance: (u: Utterance) => void,
-  setActiveUtteranceMoment: (um: UtteranceMoment) => void
+  setActiveUtterance: (u: Utterance | undefined) => void,
+  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
 ): VoiceBoard => {
   switch (vbs.type) {
     case "script":
@@ -37,6 +37,7 @@ export default (
                   stop: () => {
                     a.pause();
                     a.currentTime = 0;
+                    setActiveUtterance(undefined);
                   },
                   play: (self: Utterance) => {
                     a.load();
@@ -48,11 +49,16 @@ export default (
               })
               .filter((u) => !!u)
           );
-          let endObservers: (() => void)[] = [];
+          let endObservers: (() => void)[] = [
+            () => {
+              console.log("ended: " + line);
+            },
+          ];
           return {
             utteranceByVoice,
             onEnd: (observer: () => void) => endObservers.push(observer),
             stop: (um: UtteranceMoment) => {
+              setActiveUtteranceMoment(undefined);
               let us = Object.values(um.utteranceByVoice);
               for (let u of us) {
                 u.audio.pause();
@@ -60,6 +66,7 @@ export default (
               }
             },
             play: (um: UtteranceMoment) => {
+              console.log("started: " + line);
               setActiveUtteranceMoment(um);
               let us = Object.values(um.utteranceByVoice);
               let ended = [];
@@ -74,6 +81,7 @@ export default (
                     }
                   }
                 };
+
                 u.audio.addEventListener("ended", listener);
                 u.audio.load();
                 u.audio.play();

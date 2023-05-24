@@ -16,12 +16,15 @@ export default function App() {
   const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
     React.useState(true);
   const [voices, setVoices] = React.useState<VoiceIndex>({});
-  const [activeVoiceBoard, setActiveVoiceBoard] =
-    React.useState<VoiceBoard | null>(null);
-  const [activeUtterance, setActiveUtterance] =
-    React.useState<Utterance | null>(null);
-  const [activeUtteranceMoment, setActiveUtteranceMoment] =
-    React.useState<UtteranceMoment | null>(null);
+  const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
+    VoiceBoard | undefined
+  >(undefined);
+  const [activeUtterance, setActiveUtterance] = React.useState<
+    Utterance | undefined
+  >(undefined);
+  const [activeUtteranceMoment, setActiveUtteranceMoment] = React.useState<
+    UtteranceMoment | undefined
+  >(undefined);
   const [voiceBoardSpecs, setVoiceBoardSpecs] = React.useState<
     VoiceBoardSpec[]
   >([]);
@@ -63,6 +66,7 @@ export default function App() {
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           {voiceBoardSpecs.map((spec, i) => (
             <button
+              key={i}
               className={
                 "flex-grow-1 mx-1 btn " +
                 (!!activeVoiceBoard && i + 1 === activeVoiceBoard.id
@@ -71,7 +75,7 @@ export default function App() {
               }
               onClick={() => {
                 if (!!activeVoiceBoard && activeVoiceBoard.id === i + 1) {
-                  setActiveVoiceBoard(null);
+                  setActiveVoiceBoard(undefined);
                 } else {
                   setActiveVoiceBoard(
                     loadVoiceBoard(
@@ -96,9 +100,7 @@ export default function App() {
               voiceBoard={activeVoiceBoard}
               voices={voices}
               activeUtteranceMoment={activeUtteranceMoment}
-              setActiveUtteranceMoment={(um: UtteranceMoment) =>
-                setActiveUtteranceMoment(um)
-              }
+              setActiveUtteranceMoment={setActiveUtteranceMoment}
               preventUtteranceOverlap={preventUtteranceOverlap}
             />
           </div>

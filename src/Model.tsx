@@ -28,14 +28,12 @@ export type Toolbox = {
   type: "board";
   utterances: VoiceLangUtterances;
 };
-export type UtteranceByVoice = { [voiceAbbrev: string]: Utterance };
 export type UtteranceMoment = {
   play: (um: UtteranceMoment) => void;
   stop: (um: UtteranceMoment) => void;
   utteranceByVoice: UtteranceByVoice;
   onEnd: (observer: () => void) => void;
 };
-export type VoiceLangUtterances = { [voice: string]: LangUtterances };
 export type Conversation = {
   id: number;
   type: "conversation";
@@ -43,9 +41,7 @@ export type Conversation = {
   voices: { [abbrev: string]: string };
 };
 export type VoiceBoard = Toolbox | Conversation;
-export type LangUtterances = {
-  [lang: string]: Utterance[];
-};
+
 export type Utterance = {
   voice: string;
   label: string;
@@ -53,3 +49,6 @@ export type Utterance = {
   play: (self: Utterance) => void;
   stop: () => void;
 };
+export type LangUtterances = { [lang: string]: Utterance[] };
+export type VoiceLangUtterances = { [voice: string]: LangUtterances };
+export type UtteranceByVoice = { [voiceAbbrev: string]: Utterance };
