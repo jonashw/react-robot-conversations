@@ -24,12 +24,12 @@ export type Character = { name: string; emoji?: string; voice: string };
 export type Board = {
   id: number;
   type: "board";
-  utterances: VoiceLangUtterances;
+  utterances: CharacterLangUtterances;
 };
 export type UtteranceMoment = {
   play: (um: UtteranceMoment) => void;
   stop: (um: UtteranceMoment) => void;
-  utteranceByVoice: UtteranceByVoice;
+  utteranceByCharacter: UtteranceByCharacter;
   onEnd: (observer: () => void) => void;
 };
 export type Conversation = {
@@ -52,5 +52,5 @@ export type Utterance = {
   stop: () => void;
 };
 export type LangUtterances = { [lang: string]: Utterance[] };
-export type VoiceLangUtterances = { [voice: string]: LangUtterances };
-export type UtteranceByVoice = { [voiceAbbrev: string]: Utterance };
+export type CharacterLangUtterances = { [characterId: string]: LangUtterances };
+export type UtteranceByCharacter = { [characterId: string]: Utterance };

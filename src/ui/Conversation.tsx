@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  UtteranceMoment,
-  Conversation,
-} from "../Model";
+import { UtteranceMoment, Conversation } from "../Model";
 
 export default ({
   conversation,
@@ -14,7 +11,7 @@ export default ({
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
 }) => {
   let preventUtteranceOverlap = true;
-  let voiceAbbrevs = Object.keys(conversation.characters);
+  let characterIds = Object.keys(conversation.characters);
   const [looping, setLooping] = React.useState<boolean>(false);
   return (
     <div>
@@ -78,22 +75,22 @@ export default ({
                 activeUtteranceMoment === moment ? "table-primary" : ""
               }
             >
-              {voiceAbbrevs.map((v) =>
-                v in moment.utteranceByVoice ? (
-                  <td key={v}>
+              {characterIds.map((c) =>
+                c in moment.utteranceByCharacter ? (
+                  <td key={c}>
                     <div
                       className="text-align-center text-muted"
                       style={{ fontSize: "0.75em" }}
                     >
                       <textarea
-                        value={moment.utteranceByVoice[v].label}
+                        value={moment.utteranceByCharacter[c].label}
                         rows={3}
                         className="form-control form-control-sm"
                       />
                     </div>
                   </td>
                 ) : (
-                  <td key={v}></td>
+                  <td key={c}></td>
                 )
               )}
               <td>

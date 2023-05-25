@@ -48,7 +48,7 @@
       "p": {
         "name": "Papa",
         "emoji": "👨",
-        "voice": "Brian"
+        "voice": "Joey"
       },
       "s": {
         "name": "Sawyer",
@@ -63,17 +63,27 @@
     },
     "script": [
       { "p": "Hello puppies!" },
-      { "f": "Hello", "s": "Hello" },
+      { "f": "Hello Papa", "s": "Hello Papa" },
       { "p": "Should we go bounce together on the trampoline?" },
-      { "s": "Yes,I'm going to bounce super high" },
-      { "f": "Yes,I'm going to bounce into the clouds!" },
+      { "s": "Yes, I'm going to bounce super high" },
+      { "f": "Yes, I'm going to bounce into the clouds!" },
       { "p": "boing", "s": "boing", "f": "boing" },
       { "f": "boing" },
       { "p": "boing", "s": "boing" },
       { "f": "boing" },
       { "s": "boing" },
       { "p": "boing", "s": "boing", "f": "boing" },
-      { "p": "this makes me so tired" }
+      { "p": "all this bouncing has made me so tired" },
+      { "s": "So take a nap, Papa" },
+      { "p": "OK I will" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "p": "snore snore snore" },
+      { "f": "he he he he he", "s": "he he he he he" }
     ]
   },
   {

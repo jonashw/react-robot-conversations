@@ -2,10 +2,10 @@ import AudioRepository from "./AudioRepository";
 import {
   VoiceBoardSpec,
   VoiceBoard,
-  VoiceLangUtterances,
+  CharacterLangUtterances,
   Utterance,
   UtteranceMoment,
-  UtteranceByVoice,
+  UtteranceByCharacter,
 } from "./Model";
 
 const convert = (
@@ -29,13 +29,13 @@ const convert = (
   switch (vbs.type) {
     case "conversation":
       let utteranceMoments: UtteranceMoment[] = vbs.script.map((moment) => {
-        let utteranceByVoice: UtteranceByVoice = Object.fromEntries(
+        let utteranceByCharacter: UtteranceByCharacter = Object.fromEntries(
           Object.entries(moment)
-            .map(([v, msg]) => {
-              if (!(v in vbs.characters)) {
+            .map(([c, msg]) => {
+              if (!(c in vbs.characters)) {
                 return undefined;
               }
-              let character = vbs.characters[v];
+              let character = vbs.characters[c];
               //console.log({ line, v, msg, voice });
               let a = new Audio();
 
@@ -55,12 +55,12 @@ const convert = (
                   setActiveUtterance(undefined);
                 },
                 play: (self: Utterance) => {
-                  a.load();
+                  a.currentTime = 0;
                   a.play();
                   setActiveUtterance(self);
                 },
               };
-              return [v, utt] as [string, Utterance];
+              return [c, utt] as [string, Utterance];
             })
             .filter((u) => u !== undefined)
             .map((u) => u as [string, Utterance])
@@ -71,11 +71,11 @@ const convert = (
           },
         ];
         return {
-          utteranceByVoice,
+          utteranceByCharacter,
           onEnd: (observer: () => void) => endObservers.push(observer),
           stop: (um: UtteranceMoment) => {
             setActiveUtteranceMoment(undefined);
-            let us = Object.values(um.utteranceByVoice);
+            let us = Object.values(um.utteranceByCharacter);
             for (let u of us) {
               u.audio.pause();
               u.audio.currentTime = 0;
@@ -84,7 +84,7 @@ const convert = (
           play: (um: UtteranceMoment) => {
             //console.log("started: " + line);
             setActiveUtteranceMoment(um);
-            let us = Object.values(um.utteranceByVoice);
+            let us = Object.values(um.utteranceByCharacter);
             let ended = [];
             for (let u of us) {
               const listener = () => {
@@ -100,7 +100,7 @@ const convert = (
               };
 
               u.audio.addEventListener("ended", listener);
-              u.audio.load();
+              u.audio.currentTime = 0;
               u.audio.play();
             }
           },
@@ -128,7 +128,7 @@ const convert = (
       };
 
     case "board":
-      let boardUtterances: VoiceLangUtterances = Object.fromEntries(
+      let boardUtterances: CharacterLangUtterances = Object.fromEntries(
         vbs.voices.map((voice) => {
           let uts = Object.fromEntries(
             Object.entries(vbs.domain).map(([lang, words]) => [
