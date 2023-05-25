@@ -1,5 +1,6 @@
 [
   {
+    "name": "Farmyard dishes",
     "type": "conversation",
     "characters": {
       "cow": {
@@ -19,7 +20,7 @@
       },
       "pig": {
         "name": "Mr. Pig",
-        "voice": "Miguel",
+        "voice": "Joey",
         "emoji": "🐖"
       },
       "rooster": {
@@ -39,16 +40,22 @@
       { "cat": "meow. not me either!" },
       { "pig": "oink.  I think it should be {rooster}" },
       { "rooster": "cockle-doodle-doo" },
+      {
+        "dog": "he he he he he",
+        "cat": "he he he he he",
+        "pig": "he he he he he"
+      },
       { "cow": "moo. Oh dear. {rooster} doesn't even know what's going on." }
     ]
   },
   {
+    "name": "Trampoline",
     "type": "conversation",
     "characters": {
       "p": {
         "name": "Papa",
         "emoji": "👨",
-        "voice": "Joey"
+        "voice": "Matthew"
       },
       "s": {
         "name": "Sawyer",
@@ -87,6 +94,7 @@
     ]
   },
   {
+    "name": "Police go mad for mayo",
     "type": "conversation",
     "characters": {
       "b": {
@@ -113,6 +121,7 @@
     ]
   },
   {
+    "name": "Random 2",
     "type": "board",
     "voices": ["Brian", "Matthew"],
     "domain": {
@@ -143,6 +152,7 @@
     }
   },
   {
+    "name": "Random 1",
     "type": "board",
     "voices": ["Ivy", "Justin", "Salli", "Matthew"],
     "domain": {
@@ -159,6 +169,7 @@
     }
   },
   {
+    "name": "Bilingual test 1",
     "type": "board",
     "domain": {
       "US English": [

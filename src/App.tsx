@@ -1,5 +1,6 @@
 import "./styles.css";
 import React from "react";
+import Generator from "./Generator";
 import {
   Voice,
   VoiceBoardSpec,
@@ -48,7 +49,11 @@ export default function App() {
     async function effect() {
       let result = await fetch("/voiceboards.json");
       let specs: VoiceBoardSpec[] = await result.json();
-      setVoiceBoardSpecs(specs);
+      setVoiceBoardSpecs([
+        Generator.rowYourBoat(true),
+        Generator.rowYourBoat(false),
+        ...specs,
+      ]);
     }
     effect();
   }, []);

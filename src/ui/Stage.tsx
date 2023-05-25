@@ -2,31 +2,35 @@ import React from "react";
 import { UtteranceMoment, Character } from "../Model";
 
 export default ({
+  focusOnSpeakers,
   activeUtteranceMoment,
   characters,
 }: {
+  focusOnSpeakers: boolean;
   activeUtteranceMoment: UtteranceMoment | undefined;
   characters: { [v: string]: Character };
 }) => {
-  const focused = true;
   let characterIds = Object.keys(characters);
-  if (focused && activeUtteranceMoment !== undefined) {
+
+  if (focusOnSpeakers && activeUtteranceMoment !== undefined) {
     return (
-      <div className="d-flex justify-content-evenly">
-        {Object.keys(activeUtteranceMoment.utteranceByCharacter).map((c) => (
-          <div>
-            <div className="me-2">
-              <div className="h1">{characters[c].emoji || "👤"}</div>
-              {characters[c].name}
+      <div>
+        <div className="d-flex justify-content-evenly">
+          {Object.keys(activeUtteranceMoment.utteranceByCharacter).map((c) => (
+            <div>
+              <div className="me-2">
+                <div className="h1">{characters[c].emoji || "👤"}</div>
+                {characters[c].name}
+              </div>
+              {activeUtteranceMoment !== undefined &&
+                c in activeUtteranceMoment.utteranceByCharacter && (
+                  <div className="alert alert-primary mt-3">
+                    {activeUtteranceMoment.utteranceByCharacter[c].label}
+                  </div>
+                )}
             </div>
-            {activeUtteranceMoment !== undefined &&
-              c in activeUtteranceMoment.utteranceByCharacter && (
-                <div className="alert alert-primary mt-3">
-                  {activeUtteranceMoment.utteranceByCharacter[c].label}
-                </div>
-              )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }

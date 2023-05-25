@@ -18,8 +18,14 @@ export default ({
       <table className="table table-sm">
         <thead>
           <tr>
+            <th colSpan={5}>Characters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
-              <th
+              <td
                 style={{
                   width:
                     Math.floor(
@@ -34,17 +40,18 @@ export default ({
                   className="form-control"
                   style={{ textAlign: "center" }}
                 />
-              </th>
+              </td>
             ))}
-            <th>
+            <td>
               <button className="btn" onClick={() => alert("not implemented")}>
                 +
               </button>
-            </th>
+            </td>
           </tr>
           <tr>
+            <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
-              <th key={character.name} style={{ fontWeight: "normal" }}>
+              <td key={character.name}>
                 <input
                   type="text"
                   value={character.emoji}
@@ -54,19 +61,23 @@ export default ({
                     fontSize: "calc(1.375rem + 1.5vw)",
                   }}
                 />
-              </th>
+              </td>
             ))}
-            <th>&nbsp;</th>
+            <td>&nbsp;</td>
           </tr>
           <tr>
+            <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
-              <th key={character.name} style={{ fontWeight: "normal" }}>
-                {character.voice}
-              </th>
+              <td key={character.name}>{character.voice}</td>
             ))}
-            <th>&nbsp;</th>
+            <td>&nbsp;</td>
           </tr>
-        </thead>
+        </tbody>
+        <tbody>
+          <tr>
+            <th colSpan={5}>Conversation</th>
+          </tr>
+        </tbody>
         <tbody>
           {conversation.utteranceMoments.map((moment, mi) => (
             <tr
@@ -75,32 +86,32 @@ export default ({
                 activeUtteranceMoment === moment ? "table-primary" : ""
               }
             >
-              {characterIds.map((c) =>
-                c in moment.utteranceByCharacter ? (
-                  <td key={c}>
-                    <div
-                      className="text-align-center text-muted"
-                      style={{ fontSize: "0.75em" }}
-                    >
-                      <textarea
-                        value={moment.utteranceByCharacter[c].label}
-                        rows={3}
-                        className="form-control form-control-sm"
-                      />
-                    </div>
-                  </td>
-                ) : (
-                  <td key={c}></td>
-                )
-              )}
+              <td>
+                <button className="btn">↑</button>
+                <button className="btn">↓</button>
+              </td>
+              {characterIds.map((c) => (
+                <td key={c}>
+                  <div
+                    className="text-align-center text-muted"
+                    style={{ fontSize: "0.75em" }}
+                  >
+                    <textarea
+                      value={moment.utteranceByCharacter[c]?.label}
+                      rows={3}
+                      className="form-control form-control-sm"
+                    />
+                  </div>
+                </td>
+              ))}
               <td>
                 {activeUtteranceMoment === moment ? (
                   <button className="btn" onClick={() => moment.stop(moment)}>
-                    ⏹
+                    <img src="/icons/stop.svg" style={{ height: "1em" }} />
                   </button>
                 ) : (
                   <button className="btn" onClick={() => moment.play(moment)}>
-                    ⏵
+                    <img src="/icons/play.svg" style={{ height: "1em" }} />
                   </button>
                 )}
               </td>

@@ -116,6 +116,7 @@ const convert = (
 
       return {
         id,
+        spec: vbs,
         characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
@@ -164,6 +165,7 @@ const convert = (
 
       return {
         id,
+        spec: vbs,
         utterances: boardUtterances,
         type: "board",
       };

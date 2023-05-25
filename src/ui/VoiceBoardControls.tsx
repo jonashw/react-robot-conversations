@@ -40,6 +40,7 @@ export default ({
   );
 
   const [editing, setEditing] = React.useState<boolean>(false);
+  const [focusOnSpeakers, setFocusOnSpeakers] = React.useState<boolean>(true);
 
   reactTo([voiceBoard], () => {
     setEditing(false);
@@ -64,6 +65,7 @@ export default ({
 
   return (
     <div>
+      {vb.spec.name}
       {(() => {
         switch (vb.type) {
           case "conversation":
@@ -105,34 +107,53 @@ export default ({
 
                 {!editing && (
                   <>
-                    <div className="btn-group my-5">
-                      {(
-                        [
-                          [playing, play, "/icons/play.svg"],
-                          [stopped, stop, "/icons/stop.svg"],
-                        ] as [boolean, () => void, string][]
-                      ).map(([active, onClick, iconSrc]) => (
-                        <button
-                          disabled={active}
-                          className={
-                            "btn btn-lg " +
-                            (active
-                              ? "btn-primary active"
-                              : "btn-outline-primary")
-                          }
-                          onClick={onClick}
+                    <div className="d-flex align-items-center justify-content-around my-5">
+                      <div className="btn-group">
+                        {(
+                          [
+                            [playing, play, "/icons/play.svg"],
+                            [stopped, stop, "/icons/stop.svg"],
+                          ] as [boolean, () => void, string][]
+                        ).map(([active, onClick, iconSrc]) => (
+                          <button
+                            disabled={active}
+                            className={
+                              "btn btn-lg " +
+                              (active
+                                ? "btn-primary active"
+                                : "btn-outline-primary")
+                            }
+                            onClick={onClick}
+                          >
+                            <img
+                              src={iconSrc}
+                              style={{
+                                height: "1em",
+                                filter: active ? "invert(1)" : "",
+                              }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="form-check d-inline-block">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          defaultChecked={focusOnSpeakers}
+                          onChange={(e) => setFocusOnSpeakers(e.target.checked)}
+                          id="focus_on_speakers_checkbox"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="focus_on_speakers_checkbox"
                         >
-                          <img
-                            src={iconSrc}
-                            style={{
-                              height: "1em",
-                              filter: active ? "invert(1)" : "",
-                            }}
-                          />
-                        </button>
-                      ))}
+                          Focus on speaker(s)
+                        </label>
+                      </div>
                     </div>
                     <Stage
+                      focusOnSpeakers={focusOnSpeakers}
                       characters={conversation.characters}
                       activeUtteranceMoment={activeUtteranceMoment}
                     />
