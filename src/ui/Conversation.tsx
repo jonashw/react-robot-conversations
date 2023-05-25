@@ -1,10 +1,5 @@
 import React from "react";
 import {
-  Voice,
-  VoiceBoardSpec,
-  VoiceBoard,
-  VoiceIndex,
-  Utterance,
   UtteranceMoment,
   Conversation,
 } from "../Model";
@@ -23,7 +18,7 @@ export default ({
   const [looping, setLooping] = React.useState<boolean>(false);
   return (
     <div>
-      <table className="table">
+      <table className="table table-sm">
         <thead>
           <tr>
             {Object.entries(conversation.characters).map(([c, character]) => (

@@ -1,6 +1,6 @@
 [
   {
-    "type": "script",
+    "type": "conversation",
     "characters": {
       "cow": {
         "name": "Mrs. Cow",
@@ -43,7 +43,7 @@
     ]
   },
   {
-    "type": "script",
+    "type": "conversation",
     "characters": {
       "p": {
         "name": "Papa",
@@ -77,7 +77,7 @@
     ]
   },
   {
-    "type": "script",
+    "type": "conversation",
     "characters": {
       "b": {
         "name": "Mr. Taco",

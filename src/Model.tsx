@@ -6,7 +6,7 @@ export type Voice = {
 };
 
 export type VoiceIndex = { [name: string]: Voice };
-
+export type UtteranceId = [string, string];
 export type VoiceBoardSpec =
   | {
       type: "board";
@@ -15,20 +15,13 @@ export type VoiceBoardSpec =
     }
   | {
       type: "conversation";
-      utterances: [string, string][];
-      characters: {
-        [abbrev: string]: Character;
-      };
-    }
-  | {
-      type: "script";
       script: { [abbrev: string]: string }[];
       characters: {
         [abbrev: string]: Character;
       };
     };
 export type Character = { name: string; emoji?: string; voice: string };
-export type Toolbox = {
+export type Board = {
   id: number;
   type: "board";
   utterances: VoiceLangUtterances;
@@ -49,7 +42,7 @@ export type Conversation = {
   play: () => void;
   stop: () => void;
 };
-export type VoiceBoard = Toolbox | Conversation;
+export type VoiceBoard = Board | Conversation;
 
 export type Utterance = {
   voice: string;
