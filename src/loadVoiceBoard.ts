@@ -1,13 +1,11 @@
-import { unmountComponentAtNode } from "react-dom";
+import AudioRepository from "./AudioRepository";
 import {
-  Voice,
   VoiceBoardSpec,
   VoiceBoard,
-  VoiceIndex,
-  VoiceLangUtterances,
+  CharacterLangUtterances,
   Utterance,
   UtteranceMoment,
-  UtteranceByVoice,
+  UtteranceByCharacter,
 } from "./Model";
 
 const convert = (
@@ -16,31 +14,37 @@ const convert = (
   setActiveUtterance: (u: Utterance | undefined) => void,
   setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
 ): VoiceBoard => {
-  switch (vbs.type) {
-    case "script":
-      const interpolateCharacterNamesInMessage: (msg: string) => string =
-        (() => {
-          let replacementFns = Object.entries(vbs.characters).map(
+  const interpolateCharacterNamesInMessage = (() => {
+    let replacementFns =
+      vbs.type === "conversation"
+        ? Object.entries(vbs.characters).map(
             ([c, character]) =>
               (msg: string) =>
                 msg.replace(`{${c}}`, character.name)
-          );
-          return (msg: string) =>
-            replacementFns.reduce((msg, replace) => replace(msg), msg);
-        })();
+          )
+        : [];
+    return (msg: string) =>
+      replacementFns.reduce((msg, replace) => replace(msg), msg);
+  })();
+  switch (vbs.type) {
+    case "conversation":
       let utteranceMoments: UtteranceMoment[] = vbs.script.map((moment) => {
-        let utteranceByVoice: UtteranceByVoice = Object.fromEntries(
+        let utteranceByCharacter: UtteranceByCharacter = Object.fromEntries(
           Object.entries(moment)
-            .map(([v, msg]) => {
-              if (!(v in vbs.characters)) {
+            .map(([c, msg]) => {
+              if (!(c in vbs.characters)) {
                 return undefined;
               }
-              let character = vbs.characters[v];
+              let character = vbs.characters[c];
               //console.log({ line, v, msg, voice });
-              let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${
-                character.voice
-              }&msg=${interpolateCharacterNamesInMessage(msg)}`;
-              let a = new Audio(url);
+              let a = new Audio();
+
+              AudioRepository.getAudioBlob([
+                character.voice,
+                interpolateCharacterNamesInMessage(msg),
+              ]).then((blob) => {
+                a.src = URL.createObjectURL(blob);
+              });
               let utt: Utterance = {
                 label: interpolateCharacterNamesInMessage(msg),
                 voice: character.voice,
@@ -51,12 +55,12 @@ const convert = (
                   setActiveUtterance(undefined);
                 },
                 play: (self: Utterance) => {
-                  a.load();
+                  a.currentTime = 0;
                   a.play();
                   setActiveUtterance(self);
                 },
               };
-              return [v, utt] as [string, Utterance];
+              return [c, utt] as [string, Utterance];
             })
             .filter((u) => u !== undefined)
             .map((u) => u as [string, Utterance])
@@ -67,11 +71,11 @@ const convert = (
           },
         ];
         return {
-          utteranceByVoice,
+          utteranceByCharacter,
           onEnd: (observer: () => void) => endObservers.push(observer),
           stop: (um: UtteranceMoment) => {
             setActiveUtteranceMoment(undefined);
-            let us = Object.values(um.utteranceByVoice);
+            let us = Object.values(um.utteranceByCharacter);
             for (let u of us) {
               u.audio.pause();
               u.audio.currentTime = 0;
@@ -80,7 +84,7 @@ const convert = (
           play: (um: UtteranceMoment) => {
             //console.log("started: " + line);
             setActiveUtteranceMoment(um);
-            let us = Object.values(um.utteranceByVoice);
+            let us = Object.values(um.utteranceByCharacter);
             let ended = [];
             for (let u of us) {
               const listener = () => {
@@ -96,7 +100,7 @@ const convert = (
               };
 
               u.audio.addEventListener("ended", listener);
-              u.audio.load();
+              u.audio.currentTime = 0;
               u.audio.play();
             }
           },
@@ -112,6 +116,7 @@ const convert = (
 
       return {
         id,
+        spec: vbs,
         characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
@@ -122,81 +127,23 @@ const convert = (
           alert("not implemented");
         },
       };
-    case "conversation":
-      let utteranceMomentss: UtteranceMoment[] = vbs.utterances.map(
-        ([v, msg]) => {
-          let character = vbs.characters[v];
-          let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${character.voice}&msg=${msg}`;
-          let a = new Audio(url);
-          let utt = {
-            label: msg,
-            voice: character.voice,
-            audio: a,
-            stop: () => {
-              a.pause();
-              a.currentTime = 0;
-            },
-            play: (self: Utterance) => {
-              a.currentTime = 0;
-              a.play();
-              setActiveUtterance(self);
-            },
-          };
-          let endObservers: (() => void)[] = [];
-          utt.audio.addEventListener("ended", () => {
-            for (let o of endObservers) {
-              o();
-            }
-          });
-          return {
-            play: (um: UtteranceMoment) => {
-              utt.play(utt);
-              setActiveUtteranceMoment(um);
-            },
-            stop: (um: UtteranceMoment) => {
-              utt.stop();
-              setActiveUtteranceMoment(undefined);
-            },
-            onEnd: (ob: () => void) => {
-              endObservers.push(ob);
-            },
-            utteranceByVoice: { [v]: utt },
-          };
-        }
-      );
 
-      for (let i = 0; i < utteranceMomentss.length - 1; i++) {
-        console.log(`adding listener on ${i} for ${i + 1}`);
-        let um = utteranceMomentss[i];
-        let nextUm = utteranceMomentss[i + 1];
-        um.onEnd(() => nextUm.play(nextUm));
-      }
-      utteranceMomentss[utteranceMomentss.length - 1].onEnd(() => {
-        setActiveUtteranceMoment(undefined);
-      });
-      return {
-        id,
-        characters: vbs.characters,
-        utteranceMoments: utteranceMomentss,
-        type: "conversation",
-        play: () => {
-          alert("not implemented");
-        },
-        stop: () => {
-          alert("not implemented");
-        },
-      };
     case "board":
-      let boardUtterances: VoiceLangUtterances = Object.fromEntries(
+      let boardUtterances: CharacterLangUtterances = Object.fromEntries(
         vbs.voices.map((voice) => {
           let uts = Object.fromEntries(
             Object.entries(vbs.domain).map(([lang, words]) => [
               lang,
               words.map((w) => {
-                let url = `https://us-west1-jonashw-dev-personal-website.cloudfunctions.net/jonashw-dev-speech-synthesis-proxy?voice=${voice}&msg=${w}`;
-                let a = new Audio(url);
+                let a = new Audio();
+                AudioRepository.getAudioBlob([
+                  voice,
+                  interpolateCharacterNamesInMessage(w),
+                ]).then((blob) => {
+                  a.src = URL.createObjectURL(blob);
+                });
                 let utterance: Utterance = {
-                  label: w,
+                  label: interpolateCharacterNamesInMessage(w),
                   voice,
                   audio: a,
                   stop: () => {
@@ -218,6 +165,7 @@ const convert = (
 
       return {
         id,
+        spec: vbs,
         utterances: boardUtterances,
         type: "board",
       };

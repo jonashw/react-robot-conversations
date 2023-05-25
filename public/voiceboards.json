@@ -1,6 +1,7 @@
 [
   {
-    "type": "script",
+    "name": "Farmyard dishes",
+    "type": "conversation",
     "characters": {
       "cow": {
         "name": "Mrs. Cow",
@@ -8,8 +9,8 @@
         "emoji": "🐄"
       },
       "dog": {
-        "name": "Doggy",
-        "voice": "Brian",
+        "name": "Mr. Dog",
+        "voice": "Justin",
         "emoji": "🐕"
       },
       "cat": {
@@ -19,12 +20,12 @@
       },
       "pig": {
         "name": "Mr. Pig",
-        "voice": "Miguel",
+        "voice": "Joey",
         "emoji": "🐖"
       },
       "rooster": {
         "name": "Mr. Rooster",
-        "voice": "Justin",
+        "voice": "Brian",
         "emoji": "🐓"
       }
     },
@@ -35,20 +36,26 @@
       { "pig": "oink" },
       { "rooster": "cockle-doodle-doo" },
       { "cow": "moo.  who is going to wash the dishes?" },
-      { "dog": "bark.  not me" },
-      { "cat": "meow. not me!" },
+      { "dog": "bark.  not me.  I didn't use any" },
+      { "cat": "meow. not me either!" },
       { "pig": "oink.  I think it should be {rooster}" },
       { "rooster": "cockle-doodle-doo" },
+      {
+        "dog": "he he he he he",
+        "cat": "he he he he he",
+        "pig": "he he he he he"
+      },
       { "cow": "moo. Oh dear. {rooster} doesn't even know what's going on." }
     ]
   },
   {
-    "type": "script",
+    "name": "Trampoline",
+    "type": "conversation",
     "characters": {
       "p": {
         "name": "Papa",
         "emoji": "👨",
-        "voice": "Brian"
+        "voice": "Matthew"
       },
       "s": {
         "name": "Sawyer",
@@ -63,44 +70,58 @@
     },
     "script": [
       { "p": "Hello puppies!" },
-      { "f": "Hello", "s": "Hello" },
+      { "f": "Hello Papa", "s": "Hello Papa" },
       { "p": "Should we go bounce together on the trampoline?" },
-      { "s": "Yes,I'm going to bounce super high" },
-      { "f": "Yes,I'm going to bounce into the clouds!" },
+      { "s": "Yes, I'm going to bounce super high" },
+      { "f": "Yes, I'm going to bounce into the clouds!" },
       { "p": "boing", "s": "boing", "f": "boing" },
       { "f": "boing" },
       { "p": "boing", "s": "boing" },
       { "f": "boing" },
       { "s": "boing" },
       { "p": "boing", "s": "boing", "f": "boing" },
-      { "p": "this makes me so tired" }
+      { "p": "all this bouncing has made me so tired" },
+      { "s": "So take a nap, Papa" },
+      { "p": "OK I will" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "f": "boing" },
+      { "s": "boing" },
+      { "p": "snore snore snore" },
+      { "f": "he he he he he", "s": "he he he he he" }
     ]
   },
   {
+    "name": "Police go mad for mayo",
     "type": "conversation",
-
-    "voices": {
-      "b": "Brian",
-      "m": "Matthew"
+    "characters": {
+      "b": {
+        "name": "Mr. Taco",
+        "voice": "Brian",
+        "emoji": "🧔"
+      },
+      "m": {
+        "name": "Jeffrey",
+        "voice": "Matthew",
+        "emoji": "🤖"
+      }
     },
-    "emojis": {
-      "b": "🧔",
-      "m": "👨"
-    },
-    "utterances": [
-      ["b", "Hello Matthew,  How are you today?"],
-      ["m", "Hi Brian,  I am so angry right now."],
-      ["b", "Oh dear,  I hope it isn't more trouble with the police."],
-      ["m", "unfortunately it is! they want me to make them a sandwich."],
-      [
-        "b",
-        "well then, be sure to put extra mayonnaise on it, will you?  Police go mad for mayo."
-      ],
-      ["m", "bet, there will be even more mayo than bread"],
-      ["b", "hahahaha"]
+    "script": [
+      { "b": "Hello {m},  How are you today?" },
+      { "m": "Hi {b},  I am so angry right now." },
+      { "b": "Oh dear,  I hope it isn't more trouble with the police." },
+      { "m": "unfortunately, it is! they want me to make them a sandwich." },
+      {
+        "b": "well then, be sure to put extra mayonnaise on it, will you?  Police go mad for mayo."
+      },
+      { "m": "bet, there will be even more mayo than bread" },
+      { "b": "hahahaha" }
     ]
   },
   {
+    "name": "Random 2",
     "type": "board",
     "voices": ["Brian", "Matthew"],
     "domain": {
@@ -131,6 +152,7 @@
     }
   },
   {
+    "name": "Random 1",
     "type": "board",
     "voices": ["Ivy", "Justin", "Salli", "Matthew"],
     "domain": {
@@ -147,6 +169,7 @@
     }
   },
   {
+    "name": "Bilingual test 1",
     "type": "board",
     "domain": {
       "US English": [

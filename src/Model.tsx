@@ -6,41 +6,40 @@ export type Voice = {
 };
 
 export type VoiceIndex = { [name: string]: Voice };
-
+export type UtteranceId = [string, string];
 export type VoiceBoardSpec =
   | {
       type: "board";
+      name: string;
       voices: string[];
       domain: { [lang: string]: string[] };
     }
   | {
       type: "conversation";
-      utterances: [string, string][];
-      characters: {
-        [abbrev: string]: Character;
-      };
-    }
-  | {
-      type: "script";
+      name: string;
       script: { [abbrev: string]: string }[];
       characters: {
         [abbrev: string]: Character;
       };
     };
 export type Character = { name: string; emoji?: string; voice: string };
-export type Toolbox = {
-  id: number;
-  type: "board";
-  utterances: VoiceLangUtterances;
-};
+
 export type UtteranceMoment = {
   play: (um: UtteranceMoment) => void;
   stop: (um: UtteranceMoment) => void;
-  utteranceByVoice: UtteranceByVoice;
+  utteranceByCharacter: UtteranceByCharacter;
   onEnd: (observer: () => void) => void;
+};
+
+export type Board = {
+  id: number;
+  spec: VoiceBoardSpec;
+  type: "board";
+  utterances: CharacterLangUtterances;
 };
 export type Conversation = {
   id: number;
+  spec: VoiceBoardSpec;
   type: "conversation";
   utteranceMoments: UtteranceMoment[];
   characters: {
@@ -49,7 +48,7 @@ export type Conversation = {
   play: () => void;
   stop: () => void;
 };
-export type VoiceBoard = Toolbox | Conversation;
+export type VoiceBoard = Board | Conversation;
 
 export type Utterance = {
   voice: string;
@@ -59,5 +58,5 @@ export type Utterance = {
   stop: () => void;
 };
 export type LangUtterances = { [lang: string]: Utterance[] };
-export type VoiceLangUtterances = { [voice: string]: LangUtterances };
-export type UtteranceByVoice = { [voiceAbbrev: string]: Utterance };
+export type CharacterLangUtterances = { [characterId: string]: LangUtterances };
+export type UtteranceByCharacter = { [characterId: string]: Utterance };

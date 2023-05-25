@@ -1,6 +1,7 @@
 import React, { DependencyList, EffectCallback } from "react";
 import Conversation from "./Conversation";
 import VoiceList from "./VoiceList";
+import AudioRepository from "../AudioRepository";
 
 import Stage from "./Stage";
 import {
@@ -10,10 +11,39 @@ import {
   VoiceIndex,
   Utterance,
   UtteranceMoment,
+  Character,
 } from "../Model";
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
   React.useEffect(effect, deps);
+};
+
+const sayWithVoice = ({ voice, msg }: { voice: string; msg: string }) =>
+  AudioRepository.getAudioBlob([voice, msg]).then(
+    (blob) =>
+      new Promise<void>((resolve, reject) => {
+        let a = new Audio(URL.createObjectURL(blob));
+        a.play();
+        a.addEventListener("ended", () => {
+          resolve();
+        });
+        a.addEventListener("error", (e) => {
+          reject(e);
+        });
+      })
+  );
+
+const playMoment = (
+  characters: { [c: string]: Character },
+  moment: { [abbrev: string]: string }
+): Promise<void> => {
+  let completions = Object.entries(moment).map(([c, msg]) =>
+    sayWithVoice({
+      voice: characters[c].voice,
+      msg,
+    })
+  );
+  return Promise.all(completions).then();
 };
 
 export default ({
@@ -38,11 +68,14 @@ export default ({
   const [activeVoice, setActiveVoice] = React.useState<Voice | undefined>(
     undefined
   );
+  type BoardControlState = "editing" | "playing" | "script";
 
-  const [editing, setEditing] = React.useState<boolean>(false);
+  const [controlState, setControlState] =
+    React.useState<BoardControlState>("playing");
+  const [focusOnSpeakers, setFocusOnSpeakers] = React.useState<boolean>(true);
 
   reactTo([voiceBoard], () => {
-    setEditing(false);
+    //    setEditing(false);
     if (!!activeUtteranceMoment) {
       activeUtteranceMoment.stop(activeUtteranceMoment);
     }
@@ -64,6 +97,7 @@ export default ({
 
   return (
     <div>
+      <h6>{vb.spec.name}</h6>
       {(() => {
         switch (vb.type) {
           case "conversation":
@@ -87,15 +121,18 @@ export default ({
                 <ul className="nav nav-tabs">
                   {(
                     [
-                      ["Viewing", !editing],
-                      ["Editing", editing],
-                    ] as [string, boolean][]
-                  ).map(([label, active]) => (
+                      ["Viewing", "playing"],
+                      ["Editing", "editing"],
+                      ["Script", "script"],
+                    ] as [string, BoardControlState][]
+                  ).map(([label, state]) => (
                     <li className="nav-item">
                       <a
                         href="javascript:void(0)"
-                        onClick={() => setEditing(!editing)}
-                        className={"nav-link" + (active ? " active" : "")}
+                        onClick={() => setControlState(state)}
+                        className={
+                          "nav-link" + (state === controlState ? " active" : "")
+                        }
                       >
                         {label}
                       </a>
@@ -103,42 +140,93 @@ export default ({
                   ))}
                 </ul>
 
-                {!editing && (
+                {controlState === "script" && (
+                  <div className="mt-2">
+                    {conversation.utteranceMoments.map((um, momentIndex) => (
+                      <div
+                        className={
+                          "card mb-2" +
+                          (activeUtteranceMoment === um
+                            ? " bg-primary bg-gradient text-white"
+                            : "")
+                        }
+                      >
+                        <table className="table table-borderless m-0">
+                          <tbody>
+                            {Object.entries(um.utteranceByCharacter).map(
+                              ([c, u], uIndex) => (
+                                <tr key={uIndex} onClick={() => um.play(um)}>
+                                  <th>{conversation.characters[c].name}</th>
+                                  <td
+                                    style={{ width: "70%", textAlign: "left" }}
+                                  >
+                                    {u.label}
+                                  </td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {controlState === "playing" && (
                   <>
-                    <div className="btn-group my-5">
-                      {(
-                        [
-                          [playing, play, "/icons/play.svg"],
-                          [stopped, stop, "/icons/stop.svg"],
-                        ] as [boolean, () => void, string][]
-                      ).map(([active, onClick, iconSrc]) => (
-                        <button
-                          disabled={active}
-                          className={
-                            "btn btn-lg " +
-                            (active
-                              ? "btn-primary active"
-                              : "btn-outline-primary")
-                          }
-                          onClick={onClick}
+                    <div className="d-flex align-items-center justify-content-around my-5">
+                      <div className="btn-group">
+                        {(
+                          [
+                            [playing, play, "/icons/play.svg"],
+                            [stopped, stop, "/icons/stop.svg"],
+                          ] as [boolean, () => void, string][]
+                        ).map(([active, onClick, iconSrc]) => (
+                          <button
+                            disabled={active}
+                            className={
+                              "btn btn-lg " +
+                              (active
+                                ? "btn-primary active"
+                                : "btn-outline-primary")
+                            }
+                            onClick={onClick}
+                          >
+                            <img
+                              src={iconSrc}
+                              style={{
+                                height: "1em",
+                                filter: active ? "invert(1)" : "",
+                              }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="form-check d-inline-block">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          defaultChecked={focusOnSpeakers}
+                          onChange={(e) => setFocusOnSpeakers(e.target.checked)}
+                          id="focus_on_speakers_checkbox"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="focus_on_speakers_checkbox"
                         >
-                          <img
-                            src={iconSrc}
-                            style={{
-                              height: "1em",
-                              filter: active ? "invert(1)" : "",
-                            }}
-                          />
-                        </button>
-                      ))}
+                          Focus on speaker(s)
+                        </label>
+                      </div>
                     </div>
                     <Stage
+                      focusOnSpeakers={focusOnSpeakers}
                       characters={conversation.characters}
                       activeUtteranceMoment={activeUtteranceMoment}
                     />
                   </>
                 )}
-                {editing && (
+                {controlState === "editing" && (
                   <Conversation
                     {...{
                       conversation,
@@ -187,8 +275,12 @@ export default ({
                                   ) {
                                     activeUtterance.stop();
                                   }
-                                  u.play(u);
+                                  let ut = {
+                                    voice: activeVoice.name,
+                                    msg: u.label,
+                                  };
                                   setActiveUtterance(u);
+                                  u.play(u);
                                 }}
                               >
                                 {u.label}
