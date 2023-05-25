@@ -1,6 +1,7 @@
 import React, { DependencyList, EffectCallback } from "react";
 import Conversation from "./Conversation";
 import VoiceList from "./VoiceList";
+import AudioRepository from "../AudioRepository";
 
 import Stage from "./Stage";
 import {
@@ -10,10 +11,39 @@ import {
   VoiceIndex,
   Utterance,
   UtteranceMoment,
+  Character,
 } from "../Model";
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
   React.useEffect(effect, deps);
+};
+
+const sayWithVoice = ({ voice, msg }: { voice: string; msg: string }) =>
+  AudioRepository.getAudioBlob([voice, msg]).then(
+    (blob) =>
+      new Promise<void>((resolve, reject) => {
+        let a = new Audio(URL.createObjectURL(blob));
+        a.play();
+        a.addEventListener("ended", () => {
+          resolve();
+        });
+        a.addEventListener("error", (e) => {
+          reject(e);
+        });
+      })
+  );
+
+const playMoment = (
+  characters: { [c: string]: Character },
+  moment: { [abbrev: string]: string }
+): Promise<void> => {
+  let completions = Object.entries(moment).map(([c, msg]) =>
+    sayWithVoice({
+      voice: characters[c].voice,
+      msg,
+    })
+  );
+  return Promise.all(completions).then();
 };
 
 export default ({
@@ -245,8 +275,12 @@ export default ({
                                   ) {
                                     activeUtterance.stop();
                                   }
-                                  u.play(u);
+                                  let ut = {
+                                    voice: activeVoice.name,
+                                    msg: u.label,
+                                  };
                                   setActiveUtterance(u);
+                                  u.play(u);
                                 }}
                               >
                                 {u.label}

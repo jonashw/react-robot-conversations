@@ -1,4 +1,5 @@
 import React from "react";
+import AudioRepository from "../AudioRepository";
 import { UtteranceMoment, Character } from "../Model";
 
 export default ({
@@ -34,6 +35,14 @@ export default ({
       </div>
     );
   }
+  const characterSaysItsOwnVoice = (character: Character) => {
+    AudioRepository.getAudioBlob([character.voice, character.name]).then(
+      (blob) => {
+        let a = new Audio(URL.createObjectURL(blob));
+        a.play();
+      }
+    );
+  };
   return (
     <div>
       <div className="d-flex justify-content-evenly">
@@ -44,7 +53,7 @@ export default ({
             }}
             key={c}
           >
-            <div>
+            <div onClick={() => characterSaysItsOwnVoice(character)}>
               <div className="me-2">
                 <div className="h1">{character.emoji || "👤"}</div>
                 {character.name}
