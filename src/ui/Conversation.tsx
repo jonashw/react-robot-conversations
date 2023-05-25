@@ -10,9 +10,7 @@ export default ({
   activeUtteranceMoment: UtteranceMoment | undefined;
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
 }) => {
-  let preventUtteranceOverlap = true;
   let characterIds = Object.keys(conversation.characters);
-  const [looping, setLooping] = React.useState<boolean>(false);
   return (
     <div>
       <table className="table table-sm">
@@ -21,7 +19,7 @@ export default ({
             <th colSpan={5}>Characters</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="table-group-divider">
           <tr>
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
@@ -78,7 +76,7 @@ export default ({
             <th colSpan={5}>Conversation</th>
           </tr>
         </tbody>
-        <tbody>
+        <tbody className="table-group-divider">
           {conversation.utteranceMoments.map((moment, mi) => (
             <tr
               key={mi}

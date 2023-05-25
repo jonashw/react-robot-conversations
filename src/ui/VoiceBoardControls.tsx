@@ -38,12 +38,14 @@ export default ({
   const [activeVoice, setActiveVoice] = React.useState<Voice | undefined>(
     undefined
   );
+  type BoardControlState = "editing" | "playing" | "script";
 
-  const [editing, setEditing] = React.useState<boolean>(false);
+  const [controlState, setControlState] =
+    React.useState<BoardControlState>("playing");
   const [focusOnSpeakers, setFocusOnSpeakers] = React.useState<boolean>(true);
 
   reactTo([voiceBoard], () => {
-    setEditing(false);
+    //    setEditing(false);
     if (!!activeUtteranceMoment) {
       activeUtteranceMoment.stop(activeUtteranceMoment);
     }
@@ -65,7 +67,7 @@ export default ({
 
   return (
     <div>
-      {vb.spec.name}
+      <h6>{vb.spec.name}</h6>
       {(() => {
         switch (vb.type) {
           case "conversation":
@@ -89,15 +91,18 @@ export default ({
                 <ul className="nav nav-tabs">
                   {(
                     [
-                      ["Viewing", !editing],
-                      ["Editing", editing],
-                    ] as [string, boolean][]
-                  ).map(([label, active]) => (
+                      ["Viewing", "playing"],
+                      ["Editing", "editing"],
+                      ["Script", "script"],
+                    ] as [string, BoardControlState][]
+                  ).map(([label, state]) => (
                     <li className="nav-item">
                       <a
                         href="javascript:void(0)"
-                        onClick={() => setEditing(!editing)}
-                        className={"nav-link" + (active ? " active" : "")}
+                        onClick={() => setControlState(state)}
+                        className={
+                          "nav-link" + (state === controlState ? " active" : "")
+                        }
                       >
                         {label}
                       </a>
@@ -105,7 +110,32 @@ export default ({
                   ))}
                 </ul>
 
-                {!editing && (
+                {controlState === "script" && (
+                  <div className="mt-2">
+                    {conversation.utteranceMoments.map((um, momentIndex) => (
+                      <div className="card mb-2">
+                        <table className="table table-borderless m-0">
+                          <tbody>
+                            {Object.entries(um.utteranceByCharacter).map(
+                              ([c, u]) => (
+                                <tr>
+                                  <th>{conversation.characters[c].name}</th>
+                                  <td
+                                    style={{ width: "70%", textAlign: "left" }}
+                                  >
+                                    {u.label}
+                                  </td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {controlState === "playing" && (
                   <>
                     <div className="d-flex align-items-center justify-content-around my-5">
                       <div className="btn-group">
@@ -159,7 +189,7 @@ export default ({
                     />
                   </>
                 )}
-                {editing && (
+                {controlState === "editing" && (
                   <Conversation
                     {...{
                       conversation,
