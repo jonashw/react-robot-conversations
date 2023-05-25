@@ -113,12 +113,19 @@ export default ({
                 {controlState === "script" && (
                   <div className="mt-2">
                     {conversation.utteranceMoments.map((um, momentIndex) => (
-                      <div className="card mb-2">
+                      <div
+                        className={
+                          "card mb-2" +
+                          (activeUtteranceMoment === um
+                            ? " bg-primary bg-gradient text-white"
+                            : "")
+                        }
+                      >
                         <table className="table table-borderless m-0">
                           <tbody>
                             {Object.entries(um.utteranceByCharacter).map(
-                              ([c, u]) => (
-                                <tr>
+                              ([c, u], uIndex) => (
+                                <tr key={uIndex} onClick={() => um.play(um)}>
                                   <th>{conversation.characters[c].name}</th>
                                   <td
                                     style={{ width: "70%", textAlign: "left" }}

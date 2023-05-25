@@ -16,10 +16,15 @@ export default ({
       <table className="table table-sm">
         <thead>
           <tr>
-            <th colSpan={5}>Characters</th>
+            <th
+              className="py-3 text-align-start"
+              colSpan={2 + characterIds.length}
+            >
+              Characters
+            </th>
           </tr>
         </thead>
-        <tbody className="table-group-divider">
+        <tbody>
           <tr>
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
@@ -73,10 +78,15 @@ export default ({
         </tbody>
         <tbody>
           <tr>
-            <th colSpan={5}>Conversation</th>
+            <th
+              className="py-3 text-align-start"
+              colSpan={2 + characterIds.length}
+            >
+              Conversation
+            </th>
           </tr>
         </tbody>
-        <tbody className="table-group-divider">
+        <tbody className="py-1">
           {conversation.utteranceMoments.map((moment, mi) => (
             <tr
               key={mi}
