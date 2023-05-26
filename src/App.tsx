@@ -1,6 +1,7 @@
 import "./styles.css";
 import React from "react";
 import Generator from "./Generator";
+import useLocalStorage from "./useLocalStorage";
 import {
   Voice,
   VoiceBoardSpec,
@@ -20,7 +21,12 @@ export default function App() {
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
-  const [darkMode, setDarkMode] = React.useState<boolean>(false);
+  const [darkMode, setDarkMode] = useLocalStorage(
+    "darkMode",
+    (b) => b.toString(),
+    (str) => str === "true",
+    false
+  );
   const [activeUtterance, setActiveUtterance] = React.useState<
     Utterance | undefined
   >(undefined);
