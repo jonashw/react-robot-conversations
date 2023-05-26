@@ -1,6 +1,6 @@
 import React from "react";
 import { UtteranceMoment, Conversation } from "../Model";
-
+import ConversationAudio from "../ConversationAudio";
 export default ({
   conversation,
   activeUtteranceMoment,
@@ -118,9 +118,9 @@ export default ({
                   <button
                     className="btn"
                     onClick={() => {
-                      conversation
-                        .stopMoment(moment)
-                        .then(() => setActiveUtteranceMoment(undefined));
+                      ConversationAudio.stopMoment(conversation, moment).then(
+                        () => setActiveUtteranceMoment(undefined)
+                      );
                     }}
                   >
                     <img src="/icons/stop.svg" style={{ height: "1em" }} />
@@ -130,9 +130,9 @@ export default ({
                     className="btn"
                     onClick={() => {
                       setActiveUtteranceMoment(moment);
-                      conversation
-                        .playMoment(moment)
-                        .then(() => setActiveUtteranceMoment(undefined));
+                      ConversationAudio.playMoment(conversation, moment).then(
+                        () => setActiveUtteranceMoment(undefined)
+                      );
                     }}
                   >
                     <img src="/icons/play.svg" style={{ height: "1em" }} />

@@ -14,6 +14,7 @@ import {
   Character,
   Board,
 } from "../Model";
+import ConversationAudio from "../ConversationAudio";
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
   React.useEffect(effect, deps);
@@ -51,7 +52,9 @@ export default ({
     //    setEditing(false);
     if (!!activeUtteranceMoment) {
       if (vb.type === "conversation") {
-        vb.stopMoment(activeUtteranceMoment);
+        ConversationAudio.stopMoment(vb, activeUtteranceMoment).then(() =>
+          setActiveUtteranceMoment(undefined)
+        );
       }
     }
   });
@@ -123,11 +126,12 @@ export default ({
                                   key={uIndex}
                                   onClick={() => {
                                     setActiveUtteranceMoment(um);
-                                    conversation
-                                      .playMoment(um)
-                                      .then(() =>
-                                        setActiveUtteranceMoment(undefined)
-                                      );
+                                    ConversationAudio.playMoment(
+                                      conversation,
+                                      um
+                                    ).then(() =>
+                                      setActiveUtteranceMoment(undefined)
+                                    );
                                   }}
                                 >
                                   <th>{conversation.characters[c].name}</th>
@@ -154,17 +158,20 @@ export default ({
                           [
                             [
                               playing,
-                              () => conversation.play(setActiveUtteranceMoment),
+                              () =>
+                                ConversationAudio.play(
+                                  conversation,
+                                  setActiveUtteranceMoment
+                                ),
                               "/icons/play.svg",
                             ],
                             [
                               stopped,
                               () =>
-                                conversation
-                                  .stop()
-                                  .then(() =>
-                                    setActiveUtteranceMoment(undefined)
-                                  ),
+                                ConversationAudio.stop(conversation)
+                                .then(() =>
+                                  setActiveUtteranceMoment(undefined)
+                                ),
                               "/icons/stop.svg",
                             ],
                           ] as [boolean, () => void, string][]

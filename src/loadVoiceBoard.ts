@@ -53,36 +53,13 @@ const convert = (
           utteranceByCharacter,
         };
       });
-      let momentAudioIds = (m: UtteranceMoment): [string, string][] =>
-        Object.entries(m.utteranceByCharacter).map(
-          ([characterId, u]) =>
-            [vbs.characters[characterId].voice, u.label] as [string, string]
-        );
+
       return {
         id,
         spec: vbs,
         characters: vbs.characters,
         type: "conversation",
-        utteranceMoments,
-        play: (setActiveUtteranceMoment) =>
-          AudioOutput.playSequentially(
-            utteranceMoments.map(momentAudioIds),
-            (i) => {
-              if (i === undefined) {
-                setActiveUtteranceMoment(undefined);
-              } else {
-                setActiveUtteranceMoment(utteranceMoments[i]);
-              }
-            }
-          ),
-        stop: () =>
-          Promise.all(
-            utteranceMoments.map(momentAudioIds).map(AudioOutput.pauseAll)
-          ).then(),
-        playMoment: (m: UtteranceMoment) =>
-          AudioOutput.playInParallel(momentAudioIds(m)),
-        stopMoment: (m: UtteranceMoment) =>
-          AudioOutput.pauseAll(momentAudioIds(m)),
+        utteranceMoments
       };
 
     case "board":

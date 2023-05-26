@@ -47,12 +47,6 @@ export type Conversation = {
   characters: {
     [id: CharacterId]: Character;
   };
-  play: (
-    setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
-  ) => Promise<void>;
-  stop: () => Promise<void>;
-  playMoment: (um: UtteranceMoment) => Promise<void>;
-  stopMoment: (um: UtteranceMoment) => Promise<void>;
 };
 export type VoiceBoard = Board | Conversation;
 
