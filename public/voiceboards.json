@@ -85,11 +85,13 @@
       { "p": "OK I will" },
       { "f": "boing" },
       { "s": "boing" },
+      { "p": "snore" },
       { "f": "boing" },
       { "s": "boing" },
+      { "p": "snore" },
       { "f": "boing" },
       { "s": "boing" },
-      { "p": "snore snore snore" },
+      { "p": "snore" },
       { "f": "he he he he he", "s": "he he he he he" }
     ]
   },

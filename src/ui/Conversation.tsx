@@ -1,4 +1,5 @@
 import React from "react";
+import AudioOutput from "../AudioOutput";
 import { UtteranceMoment, Conversation } from "../Model";
 
 export default ({
@@ -11,6 +12,7 @@ export default ({
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
 }) => {
   let characterIds = Object.keys(conversation.characters);
+
   return (
     <div>
       <table className="table table-sm">
@@ -114,11 +116,17 @@ export default ({
               ))}
               <td>
                 {activeUtteranceMoment === moment ? (
-                  <button className="btn" onClick={() => moment.stop(moment)}>
+                  <button
+                    className="btn"
+                    onClick={() => conversation.playMoment(moment)}
+                  >
                     <img src="/icons/stop.svg" style={{ height: "1em" }} />
                   </button>
                 ) : (
-                  <button className="btn" onClick={() => moment.play(moment)}>
+                  <button
+                    className="btn"
+                    onClick={() => conversation.playMoment(moment)}
+                  >
                     <img src="/icons/play.svg" style={{ height: "1em" }} />
                   </button>
                 )}

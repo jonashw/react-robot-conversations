@@ -12,6 +12,7 @@ import {
   Utterance,
   UtteranceMoment,
   Character,
+  Board,
 } from "../Model";
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
@@ -77,7 +78,9 @@ export default ({
   reactTo([voiceBoard], () => {
     //    setEditing(false);
     if (!!activeUtteranceMoment) {
-      activeUtteranceMoment.stop(activeUtteranceMoment);
+      if (vb.type === "conversation") {
+        vb.stopMoment(activeUtteranceMoment);
+      }
     }
   });
 
@@ -107,12 +110,15 @@ export default ({
             const play = () => {
               if (conversation.utteranceMoments.length > 0) {
                 let um = conversation.utteranceMoments[0];
-                um.play(um);
+                conversation.playMoment(um).then(() => {
+                  setActiveUtteranceMoment(undefined);
+                });
+                setActiveUtteranceMoment(um);
               }
             };
             const stop = () => {
               if (!!activeUtteranceMoment) {
-                activeUtteranceMoment.stop(activeUtteranceMoment);
+                conversation.stopMoment(activeUtteranceMoment);
                 setActiveUtteranceMoment(undefined);
               }
             };
@@ -155,7 +161,17 @@ export default ({
                           <tbody>
                             {Object.entries(um.utteranceByCharacter).map(
                               ([c, u], uIndex) => (
-                                <tr key={uIndex} onClick={() => um.play(um)}>
+                                <tr
+                                  key={uIndex}
+                                  onClick={() => {
+                                    setActiveUtteranceMoment(um);
+                                    conversation
+                                      .playMoment(um)
+                                      .then(() =>
+                                        setActiveUtteranceMoment(undefined)
+                                      );
+                                  }}
+                                >
                                   <th>{conversation.characters[c].name}</th>
                                   <td
                                     style={{ width: "70%", textAlign: "left" }}
@@ -178,8 +194,12 @@ export default ({
                       <div className="btn-group">
                         {(
                           [
-                            [playing, play, "/icons/play.svg"],
-                            [stopped, stop, "/icons/stop.svg"],
+                            [
+                              playing,
+                              () => conversation.play(setActiveUtteranceMoment),
+                              "/icons/play.svg",
+                            ],
+                            [stopped, conversation.stop, "/icons/stop.svg"],
                           ] as [boolean, () => void, string][]
                         ).map(([active, onClick, iconSrc]) => (
                           <button
@@ -238,6 +258,7 @@ export default ({
               </>
             );
           case "board":
+            let board: Board = vb;
             return (
               <div>
                 <VoiceList
@@ -273,14 +294,11 @@ export default ({
                                     preventUtteranceOverlap &&
                                     !!activeUtterance
                                   ) {
-                                    activeUtterance.stop();
+                                    board.stop(activeUtterance);
+                                    setActiveUtterance(undefined);
                                   }
-                                  let ut = {
-                                    voice: activeVoice.name,
-                                    msg: u.label,
-                                  };
+                                  board.play(u);
                                   setActiveUtterance(u);
-                                  u.play(u);
                                 }}
                               >
                                 {u.label}

@@ -7,7 +7,7 @@ import {
   UtteranceMoment,
   UtteranceByCharacter,
 } from "./Model";
-
+import AudioOutput from "./AudioOutput";
 const convert = (
   id: number,
   vbs: VoiceBoardSpec,
@@ -36,96 +36,53 @@ const convert = (
                 return undefined;
               }
               let character = vbs.characters[c];
-              //console.log({ line, v, msg, voice });
-              let a = new Audio();
 
-              AudioRepository.getAudioBlob([
-                character.voice,
-                interpolateCharacterNamesInMessage(msg),
-              ]).then((blob) => {
-                a.src = URL.createObjectURL(blob);
-              });
+              let finalMessage = interpolateCharacterNamesInMessage(msg);
+
               let utt: Utterance = {
-                label: interpolateCharacterNamesInMessage(msg),
+                label: finalMessage,
                 voice: character.voice,
-                audio: a,
-                stop: () => {
-                  a.pause();
-                  a.currentTime = 0;
-                  setActiveUtterance(undefined);
-                },
-                play: (self: Utterance) => {
-                  a.currentTime = 0;
-                  a.play();
-                  setActiveUtterance(self);
-                },
               };
               return [c, utt] as [string, Utterance];
             })
             .filter((u) => u !== undefined)
             .map((u) => u as [string, Utterance])
         );
-        let endObservers: (() => void)[] = [
-          () => {
-            //console.log("ended: " + line);
-          },
-        ];
+
         return {
           utteranceByCharacter,
-          onEnd: (observer: () => void) => endObservers.push(observer),
-          stop: (um: UtteranceMoment) => {
-            setActiveUtteranceMoment(undefined);
-            let us = Object.values(um.utteranceByCharacter);
-            for (let u of us) {
-              u.audio.pause();
-              u.audio.currentTime = 0;
-            }
-          },
-          play: (um: UtteranceMoment) => {
-            //console.log("started: " + line);
-            setActiveUtteranceMoment(um);
-            let us = Object.values(um.utteranceByCharacter);
-            let ended = [];
-            for (let u of us) {
-              const listener = () => {
-                console.log("ended");
-                u.audio.removeEventListener("ended", listener);
-                ended.push(u);
-                if (ended.length === us.length) {
-                  setActiveUtteranceMoment(undefined);
-                  for (let o of endObservers) {
-                    o();
-                  }
-                }
-              };
-
-              u.audio.addEventListener("ended", listener);
-              u.audio.currentTime = 0;
-              u.audio.play();
-            }
-          },
         };
       });
-
-      for (let i = 0; i < utteranceMoments.length - 1; i++) {
-        console.log(`adding listener on ${i} for ${i + 1}`);
-        let um = utteranceMoments[i];
-        let nextUm = utteranceMoments[i + 1];
-        um.onEnd(() => nextUm.play(nextUm));
-      }
-
+      let momentAudioIds = (m: UtteranceMoment): [string, string][] =>
+        Object.entries(m.utteranceByCharacter).map(
+          ([characterId, u]) =>
+            [vbs.characters[characterId].voice, u.label] as [string, string]
+        );
       return {
         id,
         spec: vbs,
         characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
-        play: () => {
-          alert("not implemented");
-        },
-        stop: () => {
-          alert("not implemented");
-        },
+        play: (setActiveUtteranceMoment) =>
+          AudioOutput.playSequentially(
+            utteranceMoments.map(momentAudioIds),
+            (i) => {
+              if (i === undefined) {
+                setActiveUtteranceMoment(undefined);
+              } else {
+                setActiveUtteranceMoment(utteranceMoments[i]);
+              }
+            }
+          ),
+        stop: () =>
+          Promise.all(
+            utteranceMoments.map(momentAudioIds).map(AudioOutput.pauseAll)
+          ).then(),
+        playMoment: (m: UtteranceMoment) =>
+          AudioOutput.playInParallel(momentAudioIds(m)),
+        stopMoment: (m: UtteranceMoment) =>
+          AudioOutput.pauseAll(momentAudioIds(m)),
       };
 
     case "board":
@@ -145,15 +102,6 @@ const convert = (
                 let utterance: Utterance = {
                   label: interpolateCharacterNamesInMessage(w),
                   voice,
-                  audio: a,
-                  stop: () => {
-                    a.pause();
-                    a.currentTime = 0;
-                  },
-                  play: () => {
-                    a.currentTime = 0;
-                    a.play();
-                  },
                 };
                 return utterance;
               }),
@@ -162,12 +110,14 @@ const convert = (
           return [voice, uts];
         })
       );
-
+      let audioId = (u: Utterance): [string, string] => [u.voice, u.label];
       return {
         id,
         spec: vbs,
         utterances: boardUtterances,
         type: "board",
+        play: (u: Utterance) => AudioOutput.play(audioId(u)),
+        stop: (u: Utterance) => AudioOutput.pause(audioId(u)),
       };
   }
 };
