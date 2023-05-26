@@ -20,6 +20,7 @@ export default function App() {
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
+  const [darkMode, setDarkMode] = React.useState<boolean>(false);
   const [activeUtterance, setActiveUtterance] = React.useState<
     Utterance | undefined
   >(undefined);
@@ -29,7 +30,18 @@ export default function App() {
   const [voiceBoardSpecs, setVoiceBoardSpecs] = React.useState<
     VoiceBoardSpec[]
   >([]);
-
+  React.useLayoutEffect(() => {
+    let htmlElement = window.document.querySelector("html");
+    if (!htmlElement) {
+      return;
+    }
+    let [k, v] = ["data-bs-theme", "dark"];
+    if (darkMode) {
+      htmlElement.setAttribute(k, v);
+    } else {
+      htmlElement.removeAttribute(k);
+    }
+  }, [darkMode]);
   React.useEffect(() => {
     console.log({ activeVoiceBoard });
   }, [activeVoiceBoard]);
@@ -60,6 +72,13 @@ export default function App() {
 
   return (
     <div className="App container">
+      <button
+        className="btn btn-sm"
+        style={{ position: "fixed", bottom: "1em", left: "1em" }}
+        onClick={() => setDarkMode(!darkMode)}
+      >
+        D/N
+      </button>
       <div
         style={{
           display: "flex",
