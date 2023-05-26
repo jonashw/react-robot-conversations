@@ -78,7 +78,6 @@ export default ({
 
   return (
     <div>
-      <h6>{vb.name}</h6>
       {(() => {
         switch (vb.type) {
           case "conversation":
@@ -88,7 +87,7 @@ export default ({
 
             return (
               <>
-                <ul className="nav nav-tabs">
+                <ul className="nav nav-tabs mb-2">
                   {(
                     [
                       ["Viewing", "playing"],
@@ -111,7 +110,7 @@ export default ({
                 </ul>
 
                 {controlState === "script" && (
-                  <div className="mt-2">
+                  <div>
                     {conversation.utteranceMoments.map((um, momentIndex) => (
                       <div
                         className={

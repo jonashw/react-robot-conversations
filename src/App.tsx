@@ -2,6 +2,7 @@ import "./styles.css";
 import React from "react";
 import Generator from "./Generator";
 import useLocalStorage from "./useLocalStorage";
+import VoiceBoardSelector from "./ui/VoiceBoardSelector";
 import {
   Voice,
   SketchSpecification,
@@ -100,30 +101,38 @@ export default function App() {
           marginTop: "1em",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {voiceBoards.map((vb, i) => (
-            <button
-              key={i}
-              className={
-                "flex-grow-1 mx-1 btn " +
-                (!!activeVoiceBoard && activeVoiceBoard.id === vb.id
-                  ? "btn-primary"
-                  : "btn-outline-primary")
-              }
-              onClick={() => {
-                if (!!activeVoiceBoard && activeVoiceBoard.id === vb.id) {
-                  setActiveVoiceBoard(undefined);
-                } else {
-                  setActiveVoiceBoard(vb);
-                }
-              }}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+        {!activeVoiceBoard && (
+          <VoiceBoardSelector
+            {...{
+              voiceBoards,
+              setVoiceBoards,
+              activeVoiceBoard,
+              setActiveVoiceBoard,
+            }}
+          />
+        )}
+
         {!!activeVoiceBoard && (
           <div style={{ flexGrow: 1, marginTop: "1em" }}>
+            <div className="d-flex justify-content-between mb-3">
+              <button
+                className="btn"
+                onClick={() => {
+                  setActiveVoiceBoard(undefined);
+                }}
+              >
+                &larr;
+              </button>
+              <div
+                className="h6 flex-grow-1"
+                style={{
+                  padding: "0.375rem 0",
+                }}
+              >
+                {activeVoiceBoard.name}
+              </div>
+            </div>
+
             <VoiceBoardControls
               activeUtterance={activeUtterance}
               setActiveUtterance={setActiveUtterance}

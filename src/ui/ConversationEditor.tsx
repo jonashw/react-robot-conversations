@@ -104,6 +104,17 @@ export default ({
   };
   return (
     <div>
+      <input
+        type="text"
+        className="form-control"
+        defaultValue={conversation.name}
+        onBlur={(e) => {
+          updateConversation(conversation, {
+            ...conversation,
+            name: e.target.value,
+          });
+        }}
+      />
       <table className="table table-sm">
         <thead>
           <tr>
