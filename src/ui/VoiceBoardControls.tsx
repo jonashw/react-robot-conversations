@@ -1,54 +1,30 @@
 import React, { DependencyList, EffectCallback } from "react";
-import Conversation from "./Conversation";
+import ConversationEditor from "./ConversationEditor";
 import VoiceList from "./VoiceList";
 import AudioRepository from "../AudioRepository";
 
 import Stage from "./Stage";
 import {
   Voice,
-  VoiceBoardSpec,
+  SketchSpecification,
   VoiceBoard,
   VoiceIndex,
   Utterance,
   UtteranceMoment,
   Character,
+  Board,
+  Conversation,
 } from "../Model";
+import ConversationAudio from "../ConversationAudio";
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
   React.useEffect(effect, deps);
 };
 
-const sayWithVoice = ({ voice, msg }: { voice: string; msg: string }) =>
-  AudioRepository.getAudioBlob([voice, msg]).then(
-    (blob) =>
-      new Promise<void>((resolve, reject) => {
-        let a = new Audio(URL.createObjectURL(blob));
-        a.play();
-        a.addEventListener("ended", () => {
-          resolve();
-        });
-        a.addEventListener("error", (e) => {
-          reject(e);
-        });
-      })
-  );
-
-const playMoment = (
-  characters: { [c: string]: Character },
-  moment: { [abbrev: string]: string }
-): Promise<void> => {
-  let completions = Object.entries(moment).map(([c, msg]) =>
-    sayWithVoice({
-      voice: characters[c].voice,
-      msg,
-    })
-  );
-  return Promise.all(completions).then();
-};
-
 export default ({
   voices,
   voiceBoard,
+  updateVoiceBoard,
   preventUtteranceOverlap,
   activeUtterance,
   setActiveUtterance,
@@ -56,6 +32,7 @@ export default ({
   setActiveUtteranceMoment,
 }: {
   voices: VoiceIndex;
+  updateVoiceBoard: (prev: VoiceBoard, next: VoiceBoard) => void;
   voiceBoard: VoiceBoard;
   preventUtteranceOverlap: boolean;
   activeUtterance: Utterance | undefined;
@@ -77,7 +54,11 @@ export default ({
   reactTo([voiceBoard], () => {
     //    setEditing(false);
     if (!!activeUtteranceMoment) {
-      activeUtteranceMoment.stop(activeUtteranceMoment);
+      if (vb.type === "conversation") {
+        ConversationAudio.stopMoment(vb, activeUtteranceMoment).then(() =>
+          setActiveUtteranceMoment(undefined)
+        );
+      }
     }
   });
 
@@ -97,28 +78,16 @@ export default ({
 
   return (
     <div>
-      <h6>{vb.spec.name}</h6>
       {(() => {
         switch (vb.type) {
           case "conversation":
             const conversation = vb;
             const playing = !!activeUtteranceMoment;
             const stopped = !playing;
-            const play = () => {
-              if (conversation.utteranceMoments.length > 0) {
-                let um = conversation.utteranceMoments[0];
-                um.play(um);
-              }
-            };
-            const stop = () => {
-              if (!!activeUtteranceMoment) {
-                activeUtteranceMoment.stop(activeUtteranceMoment);
-                setActiveUtteranceMoment(undefined);
-              }
-            };
+
             return (
               <>
-                <ul className="nav nav-tabs">
+                <ul className="nav nav-tabs mb-2">
                   {(
                     [
                       ["Viewing", "playing"],
@@ -141,7 +110,7 @@ export default ({
                 </ul>
 
                 {controlState === "script" && (
-                  <div className="mt-2">
+                  <div>
                     {conversation.utteranceMoments.map((um, momentIndex) => (
                       <div
                         className={
@@ -155,7 +124,18 @@ export default ({
                           <tbody>
                             {Object.entries(um.utteranceByCharacter).map(
                               ([c, u], uIndex) => (
-                                <tr key={uIndex} onClick={() => um.play(um)}>
+                                <tr
+                                  key={uIndex}
+                                  onClick={() => {
+                                    setActiveUtteranceMoment(um);
+                                    ConversationAudio.playMoment(
+                                      conversation,
+                                      um
+                                    ).then(() =>
+                                      setActiveUtteranceMoment(undefined)
+                                    );
+                                  }}
+                                >
                                   <th>{conversation.characters[c].name}</th>
                                   <td
                                     style={{ width: "70%", textAlign: "left" }}
@@ -178,8 +158,23 @@ export default ({
                       <div className="btn-group">
                         {(
                           [
-                            [playing, play, "/icons/play.svg"],
-                            [stopped, stop, "/icons/stop.svg"],
+                            [
+                              playing,
+                              () =>
+                                ConversationAudio.play(
+                                  conversation,
+                                  setActiveUtteranceMoment
+                                ),
+                              "/icons/play.svg",
+                            ],
+                            [
+                              stopped,
+                              () =>
+                                ConversationAudio.stop(conversation).then(() =>
+                                  setActiveUtteranceMoment(undefined)
+                                ),
+                              "/icons/stop.svg",
+                            ],
                           ] as [boolean, () => void, string][]
                         ).map(([active, onClick, iconSrc]) => (
                           <button
@@ -227,9 +222,13 @@ export default ({
                   </>
                 )}
                 {controlState === "editing" && (
-                  <Conversation
+                  <ConversationEditor
                     {...{
                       conversation,
+                      updateConversation: (
+                        prev: Conversation,
+                        next: Conversation
+                      ) => updateVoiceBoard(prev, next),
                       activeUtteranceMoment: activeUtteranceMoment,
                       setActiveUtteranceMoment: setActiveUtteranceMoment,
                     }}
@@ -238,6 +237,7 @@ export default ({
               </>
             );
           case "board":
+            let board: Board = vb;
             return (
               <div>
                 <VoiceList
@@ -273,14 +273,11 @@ export default ({
                                     preventUtteranceOverlap &&
                                     !!activeUtterance
                                   ) {
-                                    activeUtterance.stop();
+                                    board.stop(activeUtterance);
+                                    setActiveUtterance(undefined);
                                   }
-                                  let ut = {
-                                    voice: activeVoice.name,
-                                    msg: u.label,
-                                  };
+                                  board.play(u);
                                   setActiveUtterance(u);
-                                  u.play(u);
                                 }}
                               >
                                 {u.label}

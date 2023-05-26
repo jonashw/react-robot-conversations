@@ -1,9 +1,11 @@
 import "./styles.css";
 import React from "react";
 import Generator from "./Generator";
+import useLocalStorage from "./useLocalStorage";
+import VoiceBoardSelector from "./ui/VoiceBoardSelector";
 import {
   Voice,
-  VoiceBoardSpec,
+  SketchSpecification,
   VoiceBoard,
   VoiceIndex,
   Utterance,
@@ -20,16 +22,31 @@ export default function App() {
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
+  const [darkMode, setDarkMode] = useLocalStorage(
+    "darkMode",
+    (b) => b.toString(),
+    (str) => str === "true",
+    false
+  );
   const [activeUtterance, setActiveUtterance] = React.useState<
     Utterance | undefined
   >(undefined);
   const [activeUtteranceMoment, setActiveUtteranceMoment] = React.useState<
     UtteranceMoment | undefined
   >(undefined);
-  const [voiceBoardSpecs, setVoiceBoardSpecs] = React.useState<
-    VoiceBoardSpec[]
-  >([]);
-
+  const [voiceBoards, setVoiceBoards] = React.useState<VoiceBoard[]>([]);
+  React.useLayoutEffect(() => {
+    let htmlElement = window.document.querySelector("html");
+    if (!htmlElement) {
+      return;
+    }
+    let [k, v] = ["data-bs-theme", "dark"];
+    if (darkMode) {
+      htmlElement.setAttribute(k, v);
+    } else {
+      htmlElement.removeAttribute(k);
+    }
+  }, [darkMode]);
   React.useEffect(() => {
     console.log({ activeVoiceBoard });
   }, [activeVoiceBoard]);
@@ -47,19 +64,35 @@ export default function App() {
 
   React.useEffect(() => {
     async function effect() {
-      let result = await fetch("/voiceboards.json");
-      let specs: VoiceBoardSpec[] = await result.json();
-      setVoiceBoardSpecs([
+      let result = await fetch("/sketches.json");
+      let specs: SketchSpecification[] = [
         Generator.rowYourBoat(true),
         Generator.rowYourBoat(false),
-        ...specs,
-      ]);
+        ...(await result.json()),
+      ];
+      let voiceBoards = specs.map((spec, i) => loadVoiceBoard(i + 1, spec));
+      setVoiceBoards(voiceBoards);
     }
     effect();
   }, []);
 
+  const updateVoiceBoard = (prev: VoiceBoard, next: VoiceBoard) => {
+    setVoiceBoards(voiceBoards.map((vb) => (vb === prev ? next : vb)));
+    console.log("update", { prev, next });
+    if (prev === activeVoiceBoard) {
+      setActiveVoiceBoard(next);
+    }
+  };
+
   return (
     <div className="App container">
+      <button
+        className="btn btn-sm"
+        style={{ position: "fixed", bottom: "1em", left: "1em" }}
+        onClick={() => setDarkMode(!darkMode)}
+      >
+        D/N
+      </button>
       <div
         style={{
           display: "flex",
@@ -68,41 +101,43 @@ export default function App() {
           marginTop: "1em",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {voiceBoardSpecs.map((spec, i) => (
-            <button
-              key={i}
-              className={
-                "flex-grow-1 mx-1 btn " +
-                (!!activeVoiceBoard && i + 1 === activeVoiceBoard.id
-                  ? "btn-primary"
-                  : "btn-outline-primary")
-              }
-              onClick={() => {
-                if (!!activeVoiceBoard && activeVoiceBoard.id === i + 1) {
-                  setActiveVoiceBoard(undefined);
-                } else {
-                  setActiveVoiceBoard(
-                    loadVoiceBoard(
-                      i + 1,
-                      spec,
-                      setActiveUtterance,
-                      setActiveUtteranceMoment
-                    )
-                  );
-                }
-              }}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+        {!activeVoiceBoard && (
+          <VoiceBoardSelector
+            {...{
+              voiceBoards,
+              setVoiceBoards,
+              activeVoiceBoard,
+              setActiveVoiceBoard,
+            }}
+          />
+        )}
+
         {!!activeVoiceBoard && (
           <div style={{ flexGrow: 1, marginTop: "1em" }}>
+            <div className="d-flex justify-content-between mb-3">
+              <button
+                className="btn"
+                onClick={() => {
+                  setActiveVoiceBoard(undefined);
+                }}
+              >
+                &larr;
+              </button>
+              <div
+                className="h6 flex-grow-1"
+                style={{
+                  padding: "0.375rem 0",
+                }}
+              >
+                {activeVoiceBoard.name}
+              </div>
+            </div>
+
             <VoiceBoardControls
               activeUtterance={activeUtterance}
               setActiveUtterance={setActiveUtterance}
               voiceBoard={activeVoiceBoard}
+              updateVoiceBoard={updateVoiceBoard}
               voices={voices}
               activeUtteranceMoment={activeUtteranceMoment}
               setActiveUtteranceMoment={setActiveUtteranceMoment}

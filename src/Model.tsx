@@ -7,7 +7,7 @@ export type Voice = {
 
 export type VoiceIndex = { [name: string]: Voice };
 export type UtteranceId = [string, string];
-export type VoiceBoardSpec =
+export type SketchSpecification =
   | {
       type: "board";
       name: string;
@@ -17,45 +17,43 @@ export type VoiceBoardSpec =
   | {
       type: "conversation";
       name: string;
-      script: { [abbrev: string]: string }[];
+      script: { [characterId: CharacterId]: Message }[];
       characters: {
-        [abbrev: string]: Character;
+        [id: CharacterId]: Character;
       };
     };
+export type Message = string;
+export type CharacterId = string;
 export type Character = { name: string; emoji?: string; voice: string };
 
 export type UtteranceMoment = {
-  play: (um: UtteranceMoment) => void;
-  stop: (um: UtteranceMoment) => void;
   utteranceByCharacter: UtteranceByCharacter;
-  onEnd: (observer: () => void) => void;
+  id: string;
 };
 
 export type Board = {
+  name: string;
   id: number;
-  spec: VoiceBoardSpec;
   type: "board";
   utterances: CharacterLangUtterances;
+  play: (um: Utterance) => Promise<void>;
+  stop: (um: Utterance) => Promise<void>;
 };
+
 export type Conversation = {
+  name: string;
   id: number;
-  spec: VoiceBoardSpec;
   type: "conversation";
   utteranceMoments: UtteranceMoment[];
   characters: {
-    [abbrev: string]: Character;
+    [id: CharacterId]: Character;
   };
-  play: () => void;
-  stop: () => void;
 };
 export type VoiceBoard = Board | Conversation;
 
 export type Utterance = {
   voice: string;
   label: string;
-  audio: HTMLAudioElement;
-  play: (self: Utterance) => void;
-  stop: () => void;
 };
 export type LangUtterances = { [lang: string]: Utterance[] };
 export type CharacterLangUtterances = { [characterId: string]: LangUtterances };
