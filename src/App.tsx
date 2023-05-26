@@ -1,8 +1,9 @@
 import "./styles.css";
 import React from "react";
 import Generator from "./Generator";
-import useLocalStorage from "./useLocalStorage";
+import DarkModeToggle from "./ui/DarkModeToggle";
 import VoiceBoardSelector from "./ui/VoiceBoardSelector";
+import PlayPause from "./ui/PlayPause";
 import {
   Voice,
   SketchSpecification,
@@ -22,12 +23,7 @@ export default function App() {
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
-  const [darkMode, setDarkMode] = useLocalStorage(
-    "darkMode",
-    (b) => b.toString(),
-    (str) => str === "true",
-    false
-  );
+
   const [activeUtterance, setActiveUtterance] = React.useState<
     Utterance | undefined
   >(undefined);
@@ -35,18 +31,7 @@ export default function App() {
     UtteranceMoment | undefined
   >(undefined);
   const [voiceBoards, setVoiceBoards] = React.useState<VoiceBoard[]>([]);
-  React.useLayoutEffect(() => {
-    let htmlElement = window.document.querySelector("html");
-    if (!htmlElement) {
-      return;
-    }
-    let [k, v] = ["data-bs-theme", "dark"];
-    if (darkMode) {
-      htmlElement.setAttribute(k, v);
-    } else {
-      htmlElement.removeAttribute(k);
-    }
-  }, [darkMode]);
+
   React.useEffect(() => {
     console.log({ activeVoiceBoard });
   }, [activeVoiceBoard]);
@@ -85,54 +70,57 @@ export default function App() {
   };
 
   return (
-    <div className="App container">
-      <button
-        className="btn btn-sm"
-        style={{ position: "fixed", bottom: "1em", left: "1em" }}
-        onClick={() => setDarkMode(!darkMode)}
-      >
-        D/N
-      </button>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-          marginTop: "1em",
-        }}
-      >
-        {!activeVoiceBoard && (
-          <VoiceBoardSelector
-            {...{
-              voiceBoards,
-              setVoiceBoards,
-              activeVoiceBoard,
-              setActiveVoiceBoard,
-            }}
-          />
-        )}
+    <div style={{ height: "100vw" }}>
+      {!activeVoiceBoard && (
+        <>
+          <nav className="navbar bg-body-tertiary mb-2">
+            <div className="container-fluid">
+              <a className="navbar-brand">Voice Sketches</a>
+              <DarkModeToggle />
+            </div>
+          </nav>
+          <div className="container-fluid">
+            <VoiceBoardSelector
+              {...{
+                voiceBoards,
+                setVoiceBoards,
+                activeVoiceBoard,
+                setActiveVoiceBoard,
+              }}
+            />
+          </div>
+        </>
+      )}
 
-        {!!activeVoiceBoard && (
-          <div style={{ flexGrow: 1, marginTop: "1em" }}>
-            <div className="d-flex justify-content-between mb-3">
+      {!!activeVoiceBoard && (
+        <div style={{ flexGrow: 1 }}>
+          <nav
+            className="navbar bg-body-tertiary mb-2"
+            style={{ position: "sticky", top: "0", zIndex: 1000 }}
+          >
+            <form
+              className="container-fluid justify-content-between"
+              style={{ flexWrap: "nowrap" }}
+            >
               <button
-                className="btn"
+                className="btn btn-lg me-3"
+                type="button"
                 onClick={() => {
                   setActiveVoiceBoard(undefined);
                 }}
               >
-                &larr;
+                ‹
               </button>
-              <div
-                className="h6 flex-grow-1"
-                style={{
-                  padding: "0.375rem 0",
-                }}
+              <a
+                className="navbar-brand flex-grow-1"
+                style={{ textOverflow: "ellipsis", overflow: "hidden" }}
               >
                 {activeVoiceBoard.name}
-              </div>
-            </div>
+              </a>
+            </form>
+          </nav>
 
+          <div className="container-fluid" style={{ paddingBottom: "4em" }}>
             <VoiceBoardControls
               activeUtterance={activeUtterance}
               setActiveUtterance={setActiveUtterance}
@@ -144,8 +132,22 @@ export default function App() {
               preventUtteranceOverlap={preventUtteranceOverlap}
             />
           </div>
-        )}
-      </div>
+          {!!activeVoiceBoard && activeVoiceBoard.type === "conversation" && (
+            <div
+              className="my-2 mx-5"
+              style={{ position: "fixed", bottom: 0, right: 0, left: 0 }}
+            >
+              <PlayPause
+                {...{
+                  conversation: activeVoiceBoard,
+                  activeUtteranceMoment,
+                  setActiveUtteranceMoment,
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

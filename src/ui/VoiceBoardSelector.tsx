@@ -24,16 +24,6 @@ export default ({
   return (
     <>
       {" "}
-      <div className="d-grid">
-        <button
-          className="btn btn-primary mb-3"
-          onClick={(e) => {
-            addNewVoiceBoard();
-          }}
-        >
-          + Create a new one
-        </button>
-      </div>
       {false && (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {voiceBoards.map((vb, i) => (
@@ -64,8 +54,7 @@ export default ({
           </button>
         </div>
       )}
-      <p>...or load an existing one:</p>
-      <div className="list-group">
+      <div className="list-group" style={{ paddingBottom: "4em" }}>
         {voiceBoards.map((vb) => (
           <a
             className="list-group-item"
@@ -78,6 +67,21 @@ export default ({
             {vb.name}
           </a>
         ))}
+      </div>
+      <div
+        style={{ position: "fixed", bottom: 0, right: 0, left: 0 }}
+        className="mx-5"
+      >
+        <div className="d-grid">
+          <button
+            className="btn btn-primary btn-lg my-2"
+            onClick={(e) => {
+              addNewVoiceBoard();
+            }}
+          >
+            + Create a new one
+          </button>
+        </div>
       </div>
     </>
   );
