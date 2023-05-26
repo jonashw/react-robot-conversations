@@ -1,17 +1,14 @@
 import React, { DependencyList, EffectCallback } from "react";
 import ConversationEditor from "./ConversationEditor";
 import VoiceList from "./VoiceList";
-import AudioRepository from "../AudioRepository";
-
+import PlayPause from "./PlayPause";
 import Stage from "./Stage";
 import {
   Voice,
-  SketchSpecification,
   VoiceBoard,
   VoiceIndex,
   Utterance,
   UtteranceMoment,
-  Character,
   Board,
   Conversation,
 } from "../Model";
@@ -82,12 +79,10 @@ export default ({
         switch (vb.type) {
           case "conversation":
             const conversation = vb;
-            const playing = !!activeUtteranceMoment;
-            const stopped = !playing;
 
             return (
               <>
-                <ul className="nav nav-tabs mb-2">
+                <ul className="nav nav-tabs nav-fill mb-2">
                   {(
                     [
                       ["Viewing", "playing"],
@@ -108,7 +103,6 @@ export default ({
                     </li>
                   ))}
                 </ul>
-
                 {controlState === "script" && (
                   <div>
                     {conversation.utteranceMoments.map((um, momentIndex) => (
@@ -151,74 +145,44 @@ export default ({
                     ))}
                   </div>
                 )}
-
                 {controlState === "playing" && (
                   <>
-                    <div className="d-flex align-items-center justify-content-around my-5">
-                      <div className="btn-group">
-                        {(
-                          [
-                            [
-                              playing,
-                              () =>
-                                ConversationAudio.play(
-                                  conversation,
-                                  setActiveUtteranceMoment
-                                ),
-                              "/icons/play.svg",
-                            ],
-                            [
-                              stopped,
-                              () =>
-                                ConversationAudio.stop(conversation).then(() =>
-                                  setActiveUtteranceMoment(undefined)
-                                ),
-                              "/icons/stop.svg",
-                            ],
-                          ] as [boolean, () => void, string][]
-                        ).map(([active, onClick, iconSrc]) => (
-                          <button
-                            disabled={active}
-                            className={
-                              "btn btn-lg " +
-                              (active
-                                ? "btn-primary active"
-                                : "btn-outline-primary")
+                    <div className="mt-5">
+                      <Stage
+                        focusOnSpeakers={focusOnSpeakers}
+                        characters={conversation.characters}
+                        activeUtteranceMoment={activeUtteranceMoment}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        position: "fixed",
+                        bottom: "4em",
+                        left: 0,
+                        right: 0,
+                      }}
+                      className="my-2"
+                    >
+                      <div className="d-flex justify-content-center">
+                        <div className="form-check d-inline-block">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            defaultChecked={focusOnSpeakers}
+                            onChange={(e) =>
+                              setFocusOnSpeakers(e.target.checked)
                             }
-                            onClick={onClick}
+                            id="focus_on_speakers_checkbox"
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="focus_on_speakers_checkbox"
                           >
-                            <img
-                              src={iconSrc}
-                              style={{
-                                height: "1em",
-                                filter: active ? "invert(1)" : "",
-                              }}
-                            />
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="form-check d-inline-block">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultChecked={focusOnSpeakers}
-                          onChange={(e) => setFocusOnSpeakers(e.target.checked)}
-                          id="focus_on_speakers_checkbox"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="focus_on_speakers_checkbox"
-                        >
-                          Focus on speaker(s)
-                        </label>
+                            Focus on speaker(s)
+                          </label>
+                        </div>
                       </div>
                     </div>
-                    <Stage
-                      focusOnSpeakers={focusOnSpeakers}
-                      characters={conversation.characters}
-                      activeUtteranceMoment={activeUtteranceMoment}
-                    />
                   </>
                 )}
                 {controlState === "editing" && (

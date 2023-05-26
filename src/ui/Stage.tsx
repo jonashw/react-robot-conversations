@@ -16,11 +16,13 @@ export default ({
   if (focusOnSpeakers && activeUtteranceMoment !== undefined) {
     return (
       <div>
-        <div className="d-flex justify-content-evenly">
+        <div className="d-flex justify-content-evenly text-center">
           {Object.keys(activeUtteranceMoment.utteranceByCharacter).map((c) => (
             <div>
               <div className="me-2">
-                <div className="h1">{characters[c].emoji || "👤"}</div>
+                <div style={{ fontSize: "5rem" }}>
+                  {characters[c].emoji || "👤"}
+                </div>
                 {characters[c].name}
               </div>
               {activeUtteranceMoment !== undefined &&
@@ -45,7 +47,7 @@ export default ({
   };
   return (
     <div>
-      <div className="d-flex justify-content-evenly">
+      <div className="d-flex justify-content-evenly text-center">
         {Object.entries(characters).map(([c, character]) => (
           <div
             style={{
