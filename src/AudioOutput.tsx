@@ -1,11 +1,11 @@
 import AudioRepository from "./AudioRepository";
 type Message = string;
 type VoiceId = string;
-type AudioId = [VoiceId, Message];
+type AudioId = string;
 
 export default (() => {
   const audioCache: Map<AudioId, HTMLAudioElement> = new Map();
-  const play = (id: AudioId): Promise<void> =>
+  const play = (id: [VoiceId, Message]): Promise<void> =>
     new Promise((resolve, reject) =>
       load(id).then((audio) => {
         audio.onended = () => {
@@ -19,23 +19,23 @@ export default (() => {
       })
     );
 
-  const playInParallel = (ids: AudioId[]): Promise<void> =>
+  const playInParallel = (ids: [VoiceId, Message][]): Promise<void> =>
     Promise.all(ids.map(play)).then();
 
-  const pauseAll = (ids: AudioId[]): Promise<void> =>
+  const pauseAll = (ids: [VoiceId, Message][]): Promise<void> =>
     Promise.all(ids.map(load)).then((audioElements) => {
       for (let a of audioElements) {
         a.pause();
       }
     });
 
-  const pause = (id: AudioId): Promise<void> =>
+  const pause = (id: [VoiceId, Message]): Promise<void> =>
     load(id).then((a) => {
       a.pause();
     });
 
   const playSequentially = (
-    ids: AudioId[][],
+    ids: [VoiceId, Message][][],
     setActiveIndex: (index: number | undefined) => void
   ): Promise<void> =>
     new Promise((resolve, reject) => {
@@ -59,10 +59,12 @@ export default (() => {
       loop();
     });
 
-  const load = (id: AudioId): Promise<HTMLAudioElement> =>
+  const load = (id: [VoiceId, Message]): Promise<HTMLAudioElement> =>
     new Promise((resolve, reject) => {
-      if (audioCache.has(id)) {
-        let audio = audioCache.get(id);
+      let [voiceId, message] = id;
+      let audioId = voiceId + ":" + message;
+      if (audioCache.has(audioId)) {
+        let audio = audioCache.get(audioId);
         if (!audio) {
           reject();
         } else {
@@ -72,10 +74,11 @@ export default (() => {
         AudioRepository.getAudioBlob(id).then((blob) => {
           let url = URL.createObjectURL(blob);
           let audio = new Audio(url);
-          audioCache.set(id, audio);
+          audioCache.set(audioId, audio);
           resolve(audio);
         });
       }
+      console.log({ audioCache });
     });
   return { pause, load, play, playInParallel, playSequentially, pauseAll };
 })();

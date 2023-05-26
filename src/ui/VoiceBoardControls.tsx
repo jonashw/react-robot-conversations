@@ -1,5 +1,5 @@
 import React, { DependencyList, EffectCallback } from "react";
-import Conversation from "./Conversation";
+import ConversationEditor from "./ConversationEditor";
 import VoiceList from "./VoiceList";
 import AudioRepository from "../AudioRepository";
 
@@ -17,34 +17,6 @@ import {
 
 const reactTo = (deps: DependencyList, effect: EffectCallback) => {
   React.useEffect(effect, deps);
-};
-
-const sayWithVoice = ({ voice, msg }: { voice: string; msg: string }) =>
-  AudioRepository.getAudioBlob([voice, msg]).then(
-    (blob) =>
-      new Promise<void>((resolve, reject) => {
-        let a = new Audio(URL.createObjectURL(blob));
-        a.play();
-        a.addEventListener("ended", () => {
-          resolve();
-        });
-        a.addEventListener("error", (e) => {
-          reject(e);
-        });
-      })
-  );
-
-const playMoment = (
-  characters: { [c: string]: Character },
-  moment: { [abbrev: string]: string }
-): Promise<void> => {
-  let completions = Object.entries(moment).map(([c, msg]) =>
-    sayWithVoice({
-      voice: characters[c].voice,
-      msg,
-    })
-  );
-  return Promise.all(completions).then();
 };
 
 export default ({
@@ -107,21 +79,7 @@ export default ({
             const conversation = vb;
             const playing = !!activeUtteranceMoment;
             const stopped = !playing;
-            const play = () => {
-              if (conversation.utteranceMoments.length > 0) {
-                let um = conversation.utteranceMoments[0];
-                conversation.playMoment(um).then(() => {
-                  setActiveUtteranceMoment(undefined);
-                });
-                setActiveUtteranceMoment(um);
-              }
-            };
-            const stop = () => {
-              if (!!activeUtteranceMoment) {
-                conversation.stopMoment(activeUtteranceMoment);
-                setActiveUtteranceMoment(undefined);
-              }
-            };
+
             return (
               <>
                 <ul className="nav nav-tabs">
@@ -199,7 +157,16 @@ export default ({
                               () => conversation.play(setActiveUtteranceMoment),
                               "/icons/play.svg",
                             ],
-                            [stopped, conversation.stop, "/icons/stop.svg"],
+                            [
+                              stopped,
+                              () =>
+                                conversation
+                                  .stop()
+                                  .then(() =>
+                                    setActiveUtteranceMoment(undefined)
+                                  ),
+                              "/icons/stop.svg",
+                            ],
                           ] as [boolean, () => void, string][]
                         ).map(([active, onClick, iconSrc]) => (
                           <button
@@ -247,7 +214,7 @@ export default ({
                   </>
                 )}
                 {controlState === "editing" && (
-                  <Conversation
+                  <ConversationEditor
                     {...{
                       conversation,
                       activeUtteranceMoment: activeUtteranceMoment,
