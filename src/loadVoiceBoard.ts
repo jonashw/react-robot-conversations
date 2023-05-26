@@ -50,6 +50,7 @@ const convert = (
         );
 
         return {
+          id: Math.random().toString(),
           utteranceByCharacter,
         };
       });
@@ -59,7 +60,7 @@ const convert = (
         spec: vbs,
         characters: vbs.characters,
         type: "conversation",
-        utteranceMoments
+        utteranceMoments,
       };
 
     case "board":

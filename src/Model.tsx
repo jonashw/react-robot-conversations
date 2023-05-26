@@ -28,6 +28,7 @@ export type Character = { name: string; emoji?: string; voice: string };
 
 export type UtteranceMoment = {
   utteranceByCharacter: UtteranceByCharacter;
+  id: string;
 };
 
 export type Board = {

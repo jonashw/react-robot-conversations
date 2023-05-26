@@ -76,6 +76,15 @@ export default function App() {
     effect();
   }, []);
 
+  const updateVoiceBoard = (prev: VoiceBoard, next: VoiceBoard) => {
+    //voiceB
+    if (prev !== activeVoiceBoard) {
+      return;
+    }
+    setActiveVoiceBoard(next);
+    console.log("update", { prev, next });
+  };
+
   return (
     <div className="App container">
       <button
@@ -128,6 +137,7 @@ export default function App() {
               activeUtterance={activeUtterance}
               setActiveUtterance={setActiveUtterance}
               voiceBoard={activeVoiceBoard}
+              updateVoiceBoard={updateVoiceBoard}
               voices={voices}
               activeUtteranceMoment={activeUtteranceMoment}
               setActiveUtteranceMoment={setActiveUtteranceMoment}

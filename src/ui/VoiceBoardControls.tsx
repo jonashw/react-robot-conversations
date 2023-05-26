@@ -13,6 +13,7 @@ import {
   UtteranceMoment,
   Character,
   Board,
+  Conversation,
 } from "../Model";
 import ConversationAudio from "../ConversationAudio";
 
@@ -23,6 +24,7 @@ const reactTo = (deps: DependencyList, effect: EffectCallback) => {
 export default ({
   voices,
   voiceBoard,
+  updateVoiceBoard,
   preventUtteranceOverlap,
   activeUtterance,
   setActiveUtterance,
@@ -30,6 +32,7 @@ export default ({
   setActiveUtteranceMoment,
 }: {
   voices: VoiceIndex;
+  updateVoiceBoard: (prev: VoiceBoard, next: VoiceBoard) => void;
   voiceBoard: VoiceBoard;
   preventUtteranceOverlap: boolean;
   activeUtterance: Utterance | undefined;
@@ -168,8 +171,7 @@ export default ({
                             [
                               stopped,
                               () =>
-                                ConversationAudio.stop(conversation)
-                                .then(() =>
+                                ConversationAudio.stop(conversation).then(() =>
                                   setActiveUtteranceMoment(undefined)
                                 ),
                               "/icons/stop.svg",
@@ -224,6 +226,10 @@ export default ({
                   <ConversationEditor
                     {...{
                       conversation,
+                      updateConversation: (
+                        prev: Conversation,
+                        next: Conversation
+                      ) => updateVoiceBoard(prev, next),
                       activeUtteranceMoment: activeUtteranceMoment,
                       setActiveUtteranceMoment: setActiveUtteranceMoment,
                     }}
