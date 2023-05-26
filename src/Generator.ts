@@ -1,6 +1,6 @@
-import { VoiceBoardSpec } from "./Model";
+import { SketchSpecification } from "./Model";
 
-const rowYourBoat = (oneBeatPerPhrase = true): VoiceBoardSpec => {
+const rowYourBoat = (oneBeatPerPhrase = true): SketchSpecification => {
   let phrases = [
     "row",
     "roww",

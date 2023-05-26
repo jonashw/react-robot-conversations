@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Voice,
-  VoiceBoardSpec,
-  VoiceBoard,
-  VoiceIndex,
-  Utterance,
-  UtteranceMoment,
-  Conversation,
-} from "../Model";
+import { Voice } from "../Model";
 
 export default ({
   voices,

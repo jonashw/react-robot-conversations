@@ -6,7 +6,7 @@ import AudioRepository from "../AudioRepository";
 import Stage from "./Stage";
 import {
   Voice,
-  VoiceBoardSpec,
+  SketchSpecification,
   VoiceBoard,
   VoiceIndex,
   Utterance,
@@ -78,7 +78,7 @@ export default ({
 
   return (
     <div>
-      <h6>{vb.spec.name}</h6>
+      <h6>{vb.name}</h6>
       {(() => {
         switch (vb.type) {
           case "conversation":

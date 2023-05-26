@@ -4,7 +4,7 @@ import Generator from "./Generator";
 import useLocalStorage from "./useLocalStorage";
 import {
   Voice,
-  VoiceBoardSpec,
+  SketchSpecification,
   VoiceBoard,
   VoiceIndex,
   Utterance,
@@ -33,9 +33,7 @@ export default function App() {
   const [activeUtteranceMoment, setActiveUtteranceMoment] = React.useState<
     UtteranceMoment | undefined
   >(undefined);
-  const [voiceBoardSpecs, setVoiceBoardSpecs] = React.useState<
-    VoiceBoardSpec[]
-  >([]);
+  const [voiceBoards, setVoiceBoards] = React.useState<VoiceBoard[]>([]);
   React.useLayoutEffect(() => {
     let htmlElement = window.document.querySelector("html");
     if (!htmlElement) {
@@ -65,24 +63,24 @@ export default function App() {
 
   React.useEffect(() => {
     async function effect() {
-      let result = await fetch("/voiceboards.json");
-      let specs: VoiceBoardSpec[] = await result.json();
-      setVoiceBoardSpecs([
+      let result = await fetch("/sketches.json");
+      let specs: SketchSpecification[] = [
         Generator.rowYourBoat(true),
         Generator.rowYourBoat(false),
-        ...specs,
-      ]);
+        ...(await result.json()),
+      ];
+      let voiceBoards = specs.map((spec, i) => loadVoiceBoard(i + 1, spec));
+      setVoiceBoards(voiceBoards);
     }
     effect();
   }, []);
 
   const updateVoiceBoard = (prev: VoiceBoard, next: VoiceBoard) => {
-    //voiceB
-    if (prev !== activeVoiceBoard) {
-      return;
-    }
-    setActiveVoiceBoard(next);
+    setVoiceBoards(voiceBoards.map((vb) => (vb === prev ? next : vb)));
     console.log("update", { prev, next });
+    if (prev === activeVoiceBoard) {
+      setActiveVoiceBoard(next);
+    }
   };
 
   return (
@@ -103,27 +101,20 @@ export default function App() {
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {voiceBoardSpecs.map((spec, i) => (
+          {voiceBoards.map((vb, i) => (
             <button
               key={i}
               className={
                 "flex-grow-1 mx-1 btn " +
-                (!!activeVoiceBoard && i + 1 === activeVoiceBoard.id
+                (!!activeVoiceBoard && activeVoiceBoard.id === vb.id
                   ? "btn-primary"
                   : "btn-outline-primary")
               }
               onClick={() => {
-                if (!!activeVoiceBoard && activeVoiceBoard.id === i + 1) {
+                if (!!activeVoiceBoard && activeVoiceBoard.id === vb.id) {
                   setActiveVoiceBoard(undefined);
                 } else {
-                  setActiveVoiceBoard(
-                    loadVoiceBoard(
-                      i + 1,
-                      spec,
-                      setActiveUtterance,
-                      setActiveUtteranceMoment
-                    )
-                  );
+                  setActiveVoiceBoard(vb);
                 }
               }}
             >

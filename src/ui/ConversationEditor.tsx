@@ -22,14 +22,17 @@ export default ({
   const removeCharacter = (characterId: string) => {
     let updatedCharacters = { ...conversation.characters };
     delete updatedCharacters[characterId];
-    let updatedUtteranceMoments = [...conversation.utteranceMoments];
-    for (let m of updatedUtteranceMoments) {
+    let updatedMoments = [...conversation.utteranceMoments];
+    for (let m of updatedMoments) {
       delete m.utteranceByCharacter[characterId];
     }
+    updatedMoments = updatedMoments.filter(
+      (m) => Object.keys(m.utteranceByCharacter).length > 0
+    );
     updateConversation(conversation, {
       ...conversation,
       characters: updatedCharacters,
-      utteranceMoments: updatedUtteranceMoments,
+      utteranceMoments: updatedMoments,
     });
   };
   const removeMoment = (momentToRemove: UtteranceMoment) => {

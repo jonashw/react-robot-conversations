@@ -7,7 +7,7 @@ export type Voice = {
 
 export type VoiceIndex = { [name: string]: Voice };
 export type UtteranceId = [string, string];
-export type VoiceBoardSpec =
+export type SketchSpecification =
   | {
       type: "board";
       name: string;
@@ -32,8 +32,8 @@ export type UtteranceMoment = {
 };
 
 export type Board = {
+  name: string;
   id: number;
-  spec: VoiceBoardSpec;
   type: "board";
   utterances: CharacterLangUtterances;
   play: (um: Utterance) => Promise<void>;
@@ -41,8 +41,8 @@ export type Board = {
 };
 
 export type Conversation = {
+  name: string;
   id: number;
-  spec: VoiceBoardSpec;
   type: "conversation";
   utteranceMoments: UtteranceMoment[];
   characters: {

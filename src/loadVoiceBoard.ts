@@ -1,6 +1,6 @@
 import AudioRepository from "./AudioRepository";
 import {
-  VoiceBoardSpec,
+  SketchSpecification,
   VoiceBoard,
   CharacterLangUtterances,
   Utterance,
@@ -8,12 +8,8 @@ import {
   UtteranceByCharacter,
 } from "./Model";
 import AudioOutput from "./AudioOutput";
-const convert = (
-  id: number,
-  vbs: VoiceBoardSpec,
-  setActiveUtterance: (u: Utterance | undefined) => void,
-  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
-): VoiceBoard => {
+
+export default (id: number, vbs: SketchSpecification): VoiceBoard => {
   const interpolateCharacterNamesInMessage = (() => {
     let replacementFns =
       vbs.type === "conversation"
@@ -56,8 +52,8 @@ const convert = (
       });
 
       return {
+        name: vbs.name,
         id,
-        spec: vbs,
         characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
@@ -90,30 +86,12 @@ const convert = (
       );
       let audioId = (u: Utterance): [string, string] => [u.voice, u.label];
       return {
+        name: vbs.name,
         id,
-        spec: vbs,
         utterances: boardUtterances,
         type: "board",
         play: (u: Utterance) => AudioOutput.play(audioId(u)),
         stop: (u: Utterance) => AudioOutput.pause(audioId(u)),
       };
   }
-};
-
-const cache: { [id: number]: VoiceBoard } = {};
-
-export default (
-  id: number,
-  vbs: VoiceBoardSpec,
-  setActiveUtterance: (u: Utterance | undefined) => void,
-  setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
-): VoiceBoard => {
-  console.log("getting " + id + " from cache", cache);
-  if (id in cache) {
-    return cache[id];
-  }
-  let sketch = convert(id, vbs, setActiveUtterance, setActiveUtteranceMoment);
-  cache[id] = sketch;
-
-  return sketch;
 };
