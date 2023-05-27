@@ -96,6 +96,9 @@ export default ({
           },
         },
       };
+      if (message.trim().length === 0) {
+        delete updatedMoment.utteranceByCharacter[characterId];
+      }
       updateConversation(conversation, {
         ...conversation,
         utteranceMoments: conversation.utteranceMoments.map((um) =>
