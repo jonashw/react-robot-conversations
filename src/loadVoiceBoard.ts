@@ -2,12 +2,10 @@ import AudioRepository from "./AudioRepository";
 import {
   SketchSpecification,
   VoiceBoard,
-  CharacterLangUtterances,
   Utterance,
   UtteranceMoment,
   UtteranceByCharacter,
 } from "./Model";
-import AudioOutput from "./AudioOutput";
 
 export default (id: number, vbs: SketchSpecification): VoiceBoard => {
   const interpolateCharacterNamesInMessage = (() => {
@@ -59,39 +57,13 @@ export default (id: number, vbs: SketchSpecification): VoiceBoard => {
         utteranceMoments,
       };
 
-    case "board":
-      let boardUtterances: CharacterLangUtterances = Object.fromEntries(
-        vbs.voices.map((voice) => {
-          let uts = Object.fromEntries(
-            Object.entries(vbs.domain).map(([lang, words]) => [
-              lang,
-              words.map((w) => {
-                let a = new Audio();
-                AudioRepository.getAudioBlob([
-                  voice,
-                  interpolateCharacterNamesInMessage(w),
-                ]).then((blob) => {
-                  a.src = URL.createObjectURL(blob);
-                });
-                let utterance: Utterance = {
-                  label: interpolateCharacterNamesInMessage(w),
-                  voice,
-                };
-                return utterance;
-              }),
-            ])
-          );
-          return [voice, uts];
-        })
-      );
-      let audioId = (u: Utterance): [string, string] => [u.voice, u.label];
+    case "cross":
       return {
         name: vbs.name,
         id,
-        utterances: boardUtterances,
-        type: "board",
-        play: (u: Utterance) => AudioOutput.play(audioId(u)),
-        stop: (u: Utterance) => AudioOutput.pause(audioId(u)),
+        voices: vbs.voices,
+        phrases: vbs.phrases,
+        type: "cross",
       };
   }
 };

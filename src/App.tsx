@@ -12,9 +12,9 @@ import {
   Utterance,
   UtteranceMoment,
 } from "./Model";
-
+import CrossControls from "./ui/CrossControls";
+import ConversationControls from "./ui/ConversationControls";
 import loadVoiceBoard from "./loadVoiceBoard";
-import VoiceBoardControls from "./ui/VoiceBoardControls";
 
 export default function App() {
   const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
@@ -48,9 +48,13 @@ export default function App() {
   }, []);
 
   React.useEffect(() => {
+    if (Object.keys(voices).length === 0) {
+      return;
+    }
     async function effect() {
       let result = await fetch("/sketches.json");
       let specs: SketchSpecification[] = [
+        Generator.englishSpeakers(voices),
         Generator.rowYourBoat(true),
         Generator.rowYourBoat(false),
         ...(await result.json()),
@@ -59,7 +63,7 @@ export default function App() {
       setVoiceBoards(voiceBoards);
     }
     effect();
-  }, []);
+  }, [voices]);
 
   const updateVoiceBoard = (prev: VoiceBoard, next: VoiceBoard) => {
     setVoiceBoards(voiceBoards.map((vb) => (vb === prev ? next : vb)));
@@ -121,16 +125,30 @@ export default function App() {
           </nav>
 
           <div className="container-fluid" style={{ paddingBottom: "4em" }}>
-            <VoiceBoardControls
-              activeUtterance={activeUtterance}
-              setActiveUtterance={setActiveUtterance}
-              voiceBoard={activeVoiceBoard}
-              updateVoiceBoard={updateVoiceBoard}
-              voices={voices}
-              activeUtteranceMoment={activeUtteranceMoment}
-              setActiveUtteranceMoment={setActiveUtteranceMoment}
-              preventUtteranceOverlap={preventUtteranceOverlap}
-            />
+            {(() => {
+              switch (activeVoiceBoard.type) {
+                case "conversation":
+                  return (
+                    <ConversationControls
+                      conversation={activeVoiceBoard}
+                      voices={voices}
+                      updateVoiceBoard={updateVoiceBoard}
+                      activeUtteranceMoment={activeUtteranceMoment}
+                      setActiveUtteranceMoment={setActiveUtteranceMoment}
+                    />
+                  );
+                case "cross":
+                  return (
+                    <CrossControls
+                      voices={voices}
+                      preventUtteranceOverlap={preventUtteranceOverlap}
+                      cross={activeVoiceBoard}
+                      activeUtterance={activeUtterance}
+                      setActiveUtterance={setActiveUtterance}
+                    />
+                  );
+              }
+            })()}
           </div>
           {!!activeVoiceBoard && activeVoiceBoard.type === "conversation" && (
             <div

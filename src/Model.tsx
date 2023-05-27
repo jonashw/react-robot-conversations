@@ -9,10 +9,10 @@ export type VoiceIndex = { [name: string]: Voice };
 export type UtteranceId = [string, string];
 export type SketchSpecification =
   | {
-      type: "board";
+      type: "cross";
       name: string;
       voices: string[];
-      domain: { [lang: string]: string[] };
+      phrases: string[];
     }
   | {
       type: "conversation";
@@ -31,13 +31,12 @@ export type UtteranceMoment = {
   id: string;
 };
 
-export type Board = {
+export type Cross = {
   name: string;
   id: number;
-  type: "board";
-  utterances: CharacterLangUtterances;
-  play: (um: Utterance) => Promise<void>;
-  stop: (um: Utterance) => Promise<void>;
+  type: "cross";
+  voices: string[];
+  phrases: string[];
 };
 
 export type Conversation = {
@@ -49,12 +48,10 @@ export type Conversation = {
     [id: CharacterId]: Character;
   };
 };
-export type VoiceBoard = Board | Conversation;
+export type VoiceBoard = Cross | Conversation;
 
 export type Utterance = {
   voice: string;
   label: string;
 };
-export type LangUtterances = { [lang: string]: Utterance[] };
-export type CharacterLangUtterances = { [characterId: string]: LangUtterances };
 export type UtteranceByCharacter = { [characterId: string]: Utterance };
