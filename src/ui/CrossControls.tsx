@@ -51,16 +51,17 @@ export default ({
                 onClick={async () => {
                   if (activePhrase !== undefined) {
                     await CrossAudio.stopAllForPhrase(cross, activePhrase);
-                    setActivePhrase(undefined);
+                    //setActivePhrase(undefined);
                   }
                   if (activeVoice !== undefined) {
                     await CrossAudio.stopAllForVoice(cross, activeVoice.name);
-                    setActiveVoice(undefined);
+                    //setActiveVoice(undefined);
                   }
                   setActivePhrase(p);
+                  setActiveVoice(activeVoice);
+
                   await CrossAudio.playAllVoicesFor(cross, p, (v) => {
-                    setActivePhrase(p);
-                    setActiveVoice(undefined);
+                    setActiveVoice(v === undefined ? undefined : voices[v]);
                   });
                 }}
               >
@@ -86,8 +87,8 @@ export default ({
                   }
                   setActiveVoice(voices[v]);
                   await CrossAudio.playAllPhrasesFor(cross, v, (p) => {
-                    setActivePhrase(undefined);
-                    setActiveVoice(voices[v]);
+                    setActivePhrase(p);
+                    //setActiveVoice(undefined);
                   });
                 }}
               >
@@ -157,51 +158,6 @@ export default ({
           ))}
         </tbody>
       </table>
-      <div>
-        <VoiceList
-          voices={Object.fromEntries(cross.voices.map((v) => [v, voices[v]]))}
-          selected={activeVoice}
-          setSelected={(s: Voice | undefined) => setActiveVoice(s)}
-        />
-      </div>
-      {!!activeVoice && (
-        <div style={{ marginTop: "1em" }}>
-          <div style={{ marginTop: "1em" }} className="d-flex flex-wrap">
-            {cross.phrases.map((phrase) => (
-              <button
-                className={
-                  "btn btn-lg btn-outline-primary" +
-                  (activePhrase === phrase ? " active" : "")
-                }
-                style={{
-                  display: "block",
-                  width: "48%",
-                  margin: "1%",
-                }}
-                onClick={() => {
-                  if (
-                    preventUtteranceOverlap &&
-                    !!activeVoice &&
-                    !!activePhrase
-                  ) {
-                    CrossAudio.stopUtterance({
-                      label: activePhrase,
-                      voice: activeVoice.name,
-                    });
-                  }
-                  setActivePhrase(phrase);
-                  CrossAudio.playUtterance({
-                    voice: activeVoice.name,
-                    label: phrase,
-                  });
-                }}
-              >
-                {phrase}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </>
   );
 };
