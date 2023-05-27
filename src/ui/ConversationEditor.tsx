@@ -1,12 +1,14 @@
 import React from "react";
-import { UtteranceMoment, Conversation, Character } from "../Model";
+import { UtteranceMoment, Conversation, Character, VoiceIndex } from "../Model";
 import ConversationAudio from "../ConversationAudio";
 export default ({
+  voiceIndex,
   conversation,
   updateConversation,
   activeUtteranceMoment,
   setActiveUtteranceMoment,
 }: {
+  voiceIndex: VoiceIndex;
   conversation: Conversation;
   updateConversation: (prev: Conversation, next: Conversation) => void;
   activeUtteranceMoment: UtteranceMoment | undefined;
@@ -203,7 +205,22 @@ export default ({
           <tr>
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
-              <td key={character.name}>{character.voice}</td>
+              <td key={character.name}>
+                <select
+                  className="form-control"
+                  defaultValue={character.voice}
+                  onChange={(e) =>
+                    updateCharacter(c, {
+                      ...character,
+                      voice: e.target.value,
+                    })
+                  }
+                >
+                  {Object.keys(voiceIndex).map((v) => (
+                    <option value={v}>{v}</option>
+                  ))}
+                </select>
+              </td>
             ))}
             <td>&nbsp;</td>
           </tr>

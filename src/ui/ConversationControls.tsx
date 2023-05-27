@@ -139,6 +139,7 @@ export default ({
         <ConversationEditor
           {...{
             conversation,
+            voiceIndex: voices,
             updateConversation: (prev: Conversation, next: Conversation) =>
               updateVoiceBoard(prev, next),
             activeUtteranceMoment: activeUtteranceMoment,
