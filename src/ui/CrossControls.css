@@ -1,0 +1,14 @@
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform: 
+    /* 45 is really 360 - 45 */ rotate(-90deg);
+  width: 30px;
+}
+th.rotate > div > span {
+  padding: 5px 10px;
+}

@@ -143,8 +143,6 @@ export default function App() {
                       voices={voices}
                       preventUtteranceOverlap={preventUtteranceOverlap}
                       cross={activeVoiceBoard}
-                      activeUtterance={activeUtterance}
-                      setActiveUtterance={setActiveUtterance}
                     />
                   );
               }
