@@ -124,83 +124,34 @@
   },
   {
     "name": "Random 2",
-    "type": "board",
+    "type": "cross",
     "voices": ["Brian", "Matthew"],
-    "domain": {
-      "British English": [
-        "yes, of course.",
-        "no, I don't think so.",
-        "I'll huff and I'll puff",
-        "oh dear.",
-        "I wouldn't do that, if I were you",
-        "something smells stinky",
-        "hey now, please stop eating my spaghetti",
-        "let go! You are going to break it",
-        "go home and eat oatmeal with your papa",
-        "you'd better wash your hands"
-      ],
-      "US English": [
-        "yes, of course.",
-        "no, I don't think so.",
-        "I'll huff and I'll puff",
-        "oh dear.",
-        "I wouldn't do that, if I were you",
-        "something smells stinky",
-        "hey now, please stop eating my spaghetti",
-        "let go! You are going to break it",
-        "go home and eat oatmeal with your papa",
-        "you'd better wash your hands"
-      ]
-    }
+    "phrases": [
+      "yes, of course.",
+      "no, I don't think so.",
+      "I'll huff and I'll puff",
+      "oh dear.",
+      "I wouldn't do that, if I were you",
+      "something smells stinky",
+      "hey now, please stop eating my spaghetti",
+      "let go! You are going to break it",
+      "go home and eat oatmeal with your papa",
+      "you'd better wash your hands"
+    ]
   },
   {
     "name": "Random 1",
-    "type": "board",
+    "type": "cross",
     "voices": ["Ivy", "Justin", "Salli", "Matthew"],
-    "domain": {
-      "US English": [
-        "Yes",
-        "No",
-        "Not gonna happen",
-        "I don't know",
-        "I'm scared",
-        "I'm Hungry!",
-        "Please",
-        "I'm sorry"
-      ]
-    }
-  },
-  {
-    "name": "Bilingual test 1",
-    "type": "board",
-    "domain": {
-      "US English": [
-        "hi",
-        "yes",
-        "no",
-        "maybe",
-        "ok",
-        "of course",
-        "NO WAY JOSÉ!",
-        "I farted!",
-        "PICKLES!!!",
-        "me name na-na",
-        "I'm tired"
-      ],
-      "US Spanish": [
-        "hola",
-        "sí",
-        "no",
-        "tal vez",
-        "bueno",
-        "porsopuesto",
-        "NUNCA JOSE!",
-        "hice un pedo",
-        "pepinos!!!",
-        "me llamo nana",
-        "tengo sueño"
-      ]
-    },
-    "voices": ["Ivy", "Matthew", "Salli", "Justin", "Lupe", "Miguel"]
+    "phrases": [
+      "Yes",
+      "No",
+      "Not gonna happen",
+      "I don't know",
+      "I'm scared",
+      "I'm Hungry!",
+      "Please",
+      "I'm sorry"
+    ]
   }
 ]

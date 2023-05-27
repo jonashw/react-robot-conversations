@@ -1,4 +1,13 @@
 import { UtteranceId } from "./Model";
+
+(async () => {
+  let e = await navigator.storage.estimate();
+  let kb = e?.usage || 0;
+  console.log(
+    `STORAGE ESTIMATE of this indexedDB: ${Math.floor(kb / 1024)} KB`
+  );
+})();
+
 let openRequest = indexedDB.open("voicess-store", 1);
 openRequest.onupgradeneeded = function () {
   let db = openRequest.result;
