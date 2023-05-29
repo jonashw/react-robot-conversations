@@ -5,9 +5,72 @@ import {
   Utterance,
   UtteranceMoment,
   UtteranceByCharacter,
+  VoiceIndex,
+  Character,
 } from "./Model";
 
-export default (id: number, vbs: SketchSpecification): VoiceBoard => {
+export const parseConversationText = (
+  voiceIndex: VoiceIndex,
+  rawScript: string
+): VoiceBoard => {
+  let sections = rawScript.split(/# ?begin script/);
+
+  let voiceNames = Object.keys(voiceIndex);
+  let randomVoice = () =>
+    voiceNames[Math.floor(Math.random() * voiceNames.length)];
+
+  let utterances = (sections.length === 2 ? sections[1] : rawScript)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((l) => l.split(":").filter((arr) => arr.length !== 2));
+
+  let characters =
+    sections.length === 2
+      ? Object.fromEntries(
+          sections[0]
+            .split("\n")
+            .map((l) => l.split(":").map((str) => str.trim()))
+            .filter((arr) => arr.length === 2)
+            .map(([characterId, voice]) => [characterId, voice.split(",")])
+            .map(([characterId, characterProps]) => [
+              characterId,
+              {
+                voice: characterProps[0],
+                name: characterId,
+                emoji:
+                  characterProps.length === 2 ? characterProps[1] : undefined,
+              },
+            ])
+        )
+      : utterances.reduce((uniqueCharecters, [characterId, message]) => {
+          if (!(characterId in uniqueCharecters)) {
+            uniqueCharecters[characterId] = {
+              name: characterId,
+              emoji: undefined,
+              voice: randomVoice(),
+            };
+          }
+          return uniqueCharecters;
+        }, {} as { [characterId: string]: Character });
+
+  let script = utterances.map(([characterId, phrase]) => ({
+    [characterId]: phrase,
+  }));
+  console.log({ sections, utterances, characters, script });
+  let vb: VoiceBoard = loadVoiceBoard(900, {
+    name: "pasted",
+    type: "conversation",
+    script,
+    characters,
+  });
+  return vb;
+};
+
+export const loadVoiceBoard = (
+  id: number,
+  vbs: SketchSpecification
+): VoiceBoard => {
   const interpolateCharacterNamesInMessage = (() => {
     let replacementFns =
       vbs.type === "conversation"
