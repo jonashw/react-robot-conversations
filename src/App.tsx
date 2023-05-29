@@ -14,12 +14,13 @@ import {
 } from "./Model";
 import CrossControls from "./ui/CrossControls";
 import ConversationControls from "./ui/ConversationControls";
-import loadVoiceBoard from "./loadVoiceBoard";
+import { loadVoiceBoard } from "./loadVoiceBoard";
 
 export default function App() {
   const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
     React.useState(true);
   const [voices, setVoices] = React.useState<VoiceIndex>({});
+  const voiceIndex = voices;
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
@@ -87,6 +88,7 @@ export default function App() {
             <VoiceBoardSelector
               {...{
                 voiceBoards,
+                voiceIndex,
                 setVoiceBoards,
                 activeVoiceBoard,
                 setActiveVoiceBoard,
