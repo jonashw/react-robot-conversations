@@ -3,7 +3,7 @@ import { Voice, VoiceIndex, VoiceBoard, Character } from "../Model";
 let sampleScript = `
 Bob: Justin,👦
 Alice: Ivy,👧
-Narrator: Matthew.👤
+Narrator: Matthew,👤
 Officer Chunky: Salli,👮‍♀️
 # begin script
 Narrator: Alice is walking down the sidewalk without any clothes on.  Bob sees her from across the street and runs over to say hi to her.
