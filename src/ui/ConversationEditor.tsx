@@ -1,5 +1,11 @@
 import React from "react";
-import { UtteranceMoment, Conversation, Character, VoiceIndex } from "../Model";
+import {
+  Utterance,
+  UtteranceMoment,
+  Conversation,
+  Character,
+  VoiceIndex,
+} from "../Model";
 import ConversationAudio from "../ConversationAudio";
 export default ({
   voiceIndex,
@@ -14,6 +20,24 @@ export default ({
   activeUtteranceMoment: UtteranceMoment | undefined;
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
 }) => {
+  const removeCharacterIfDead = (characterId: string) => {
+    for (let characterId of Object.keys(conversation.characters)) {
+      let substantiveUtterancesByThisCharacter = conversation.utteranceMoments
+        .filter((um) => um !== activeUtteranceMoment)
+        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
+        .filter((msg) => msg.length > 0);
+      console.log({ substantiveUtterancesByThisCharacter });
+      if (
+        substantiveUtterancesByThisCharacter.length === 0 &&
+        confirm(
+          `Character "${characterId}" no longer has a speaking moment.  Remove?`
+        )
+      ) {
+        removeCharacter(characterId);
+      }
+    }
+  };
+
   let characterIds = Object.keys(conversation.characters);
   const updateCharacter = (characterId: string, next: Character) => {
     updateConversation(conversation, {
@@ -86,25 +110,52 @@ export default ({
     message: string
   ) => {
     {
-      let updatedMoment = {
+      let updatedMoment: UtteranceMoment | undefined = {
         ...moment,
         utteranceByCharacter: {
           ...moment.utteranceByCharacter,
           [characterId]: {
             voice: conversation.characters[characterId].voice,
             label: message,
-          },
+          } as Utterance,
         },
       };
+      let substantiveUtterancesInTheMoment = Object.entries(
+        updatedMoment.utteranceByCharacter
+      )
+        .map(([s, u]) => ({ ...u, label: (u.label || "").trim() }))
+        .filter(({ label }) => label !== "");
+
+      if (
+        substantiveUtterancesInTheMoment.length === 0 &&
+        confirm("Nobody is talking in this moment.  Remove?")
+      ) {
+        updatedMoment = undefined;
+      }
+      let updatedUtteranceMoments = conversation.utteranceMoments
+        .map((um) => (um === moment ? updatedMoment : um))
+        .filter((um) => um !== undefined)
+        .map((um) => um as UtteranceMoment);
+
       if (message.trim().length === 0) {
-        delete updatedMoment.utteranceByCharacter[characterId];
+        delete updatedMoment?.utteranceByCharacter[characterId];
       }
       updateConversation(conversation, {
         ...conversation,
-        utteranceMoments: conversation.utteranceMoments.map((um) =>
-          um === moment ? updatedMoment : um
-        ),
+        utteranceMoments: updatedUtteranceMoments,
       });
+      let substantiveUtterancesByThisCharacter = updatedUtteranceMoments
+        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
+        .filter((msg) => msg.length > 0);
+      console.log({ substantiveUtterancesByThisCharacter });
+      if (
+        substantiveUtterancesByThisCharacter.length === 0 &&
+        confirm(
+          `Character "${conversation.characters[characterId].name}" no longer has a speaking moment.  Remove?`
+        )
+      ) {
+        removeCharacter(characterId);
+      }
     }
   };
   return (
@@ -132,7 +183,7 @@ export default ({
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr style={{ position: "sticky", top: "4em" }} className="bg-success">
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
               <td
@@ -160,7 +211,7 @@ export default ({
             ))}
             <td>
               <button
-                className="btn"
+                className="btn btn-success"
                 onClick={() => {
                   let newId = Math.random().toString();
                   let newCharacter = {
@@ -265,20 +316,24 @@ export default ({
               }
             >
               <td>
-                <button
-                  disabled={mi === 0}
-                  className="btn"
-                  onClick={() => moveMoment(moment, "up")}
-                >
-                  ↑
-                </button>
-                <button
-                  disabled={mi === conversation.utteranceMoments.length - 1}
-                  className="btn"
-                  onClick={() => moveMoment(moment, "down")}
-                >
-                  ↓
-                </button>
+                <div className="d-grid">
+                  <div className="btn-group-vertical">
+                    <button
+                      disabled={mi === 0}
+                      className="btn btn-secondary"
+                      onClick={() => moveMoment(moment, "up")}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      disabled={mi === conversation.utteranceMoments.length - 1}
+                      className="btn btn-secondary"
+                      onClick={() => moveMoment(moment, "down")}
+                    >
+                      ↓
+                    </button>
+                  </div>
+                </div>
               </td>
               {characterIds.map((c) => (
                 <td key={c}>
@@ -298,40 +353,48 @@ export default ({
                 </td>
               ))}
               <td>
-                {activeUtteranceMoment === moment ? (
-                  <button
-                    className="btn"
-                    onClick={() => {
-                      ConversationAudio.stopMoment(conversation, moment).then(
-                        () => setActiveUtteranceMoment(undefined)
-                      );
-                    }}
-                  >
-                    <img src="/icons/stop.svg" style={{ height: "1em" }} />
-                  </button>
-                ) : (
-                  <button
-                    className="btn"
-                    onClick={() => {
-                      setActiveUtteranceMoment(moment);
-                      ConversationAudio.playMoment(conversation, moment).then(
-                        () => setActiveUtteranceMoment(undefined)
-                      );
-                    }}
-                  >
-                    <img src="/icons/play.svg" style={{ height: "1em" }} />
-                  </button>
-                )}
-                <button
-                  className="btn btn-outline-danger"
-                  onClick={() => {
-                    if (confirm("Are you sure?")) {
-                      removeMoment(moment);
-                    }
-                  }}
-                >
-                  &times;
-                </button>
+                <div className="d-grid">
+                  <div className="btn-group-vertical">
+                    {activeUtteranceMoment === moment ? (
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          ConversationAudio.stopMoment(
+                            conversation,
+                            moment
+                          ).then(() => setActiveUtteranceMoment(undefined));
+                        }}
+                      >
+                        <img src="/icons/stop.svg" style={{ height: "1em" }} />
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          setActiveUtteranceMoment(moment);
+                          ConversationAudio.playMoment(
+                            conversation,
+                            moment
+                          ).then(() => setActiveUtteranceMoment(undefined));
+                        }}
+                      >
+                        <img src="/icons/play.svg" style={{ height: "1em" }} />
+                      </button>
+                    )}
+                    {/*
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => {
+                        if (confirm("Are you sure?")) {
+                          removeMoment(moment);
+                        }
+                      }}
+                    >
+                      &times;
+                    </button>
+                    */}
+                  </div>
+                </div>
               </td>
             </tr>
           ))}
