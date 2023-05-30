@@ -1,5 +1,24 @@
 [
   {
+    "name": "Bluey and Bandit's Yes/No buttons",
+    "type": "simple",
+    "voice": "Brian",
+    "phrases": ["Yes", "No"]
+  },
+  {
+    "name": "Bluey and Bandit PLUS",
+    "type": "simple",
+    "voice": "Brian",
+    "phrases": [
+      "Yes",
+      "No",
+      "Maybe",
+      "Maybe not",
+      "I don't know what you're talking about.",
+      "I don't want to talk right now."
+    ]
+  },
+  {
     "name": "Farmyard dishes",
     "type": "conversation",
     "characters": {

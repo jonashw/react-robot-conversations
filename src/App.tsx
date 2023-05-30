@@ -4,6 +4,7 @@ import Generator from "./Generator";
 import DarkModeToggle from "./ui/DarkModeToggle";
 import VoiceBoardSelector from "./ui/VoiceBoardSelector";
 import PlayPause from "./ui/PlayPause";
+import SimpleControls from "./ui/SimpleControls";
 import {
   Voice,
   SketchSpecification,
@@ -11,10 +12,15 @@ import {
   VoiceIndex,
   Utterance,
   UtteranceMoment,
+  Simple,
 } from "./Model";
 import CrossControls from "./ui/CrossControls";
 import ConversationControls from "./ui/ConversationControls";
 import { loadVoiceBoard } from "./loadVoiceBoard";
+
+function assertUnreachable(x: never): never {
+  throw new Error("Didn't expect to get here");
+}
 
 export default function App() {
   const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
@@ -147,6 +153,12 @@ export default function App() {
                       cross={activeVoiceBoard}
                     />
                   );
+                case "simple":
+                  let simple: Simple = activeVoiceBoard;
+                  return <SimpleControls simple={simple} />;
+                default:
+                  assertUnreachable(activeVoiceBoard);
+                  break;
               }
             })()}
           </div>

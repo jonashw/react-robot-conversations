@@ -84,6 +84,14 @@ export const loadVoiceBoard = (
       replacementFns.reduce((msg, replace) => replace(msg), msg);
   })();
   switch (vbs.type) {
+    case "simple":
+      return {
+        name: vbs.name,
+        id,
+        voice: vbs.voice,
+        type: "simple",
+        phrases: vbs.phrases,
+      };
     case "conversation":
       let utteranceMoments: UtteranceMoment[] = vbs.script.map((moment) => {
         let utteranceByCharacter: UtteranceByCharacter = Object.fromEntries(
