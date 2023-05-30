@@ -9,6 +9,12 @@ export type VoiceIndex = { [name: string]: Voice };
 export type UtteranceId = [string, string];
 export type SketchSpecification =
   | {
+      type: "simple";
+      name: string;
+      voice: string;
+      phrases: string[];
+    }
+  | {
       type: "cross";
       name: string;
       voices: string[];
@@ -30,7 +36,13 @@ export type UtteranceMoment = {
   utteranceByCharacter: UtteranceByCharacter;
   id: string;
 };
-
+export type Simple = {
+  name: string;
+  id: number;
+  type: "simple";
+  voice: string;
+  phrases: string[];
+};
 export type Cross = {
   name: string;
   id: number;
@@ -48,7 +60,7 @@ export type Conversation = {
     [id: CharacterId]: Character;
   };
 };
-export type VoiceBoard = Cross | Conversation;
+export type VoiceBoard = Cross | Conversation | Simple;
 
 export type Utterance = {
   voice: string;
