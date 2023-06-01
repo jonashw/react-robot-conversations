@@ -276,8 +276,8 @@ export default ({
                     })
                   }
                 >
-                  {Object.keys(voiceIndex).map((v) => (
-                    <option value={v}>{v}</option>
+                  {voiceIndex.getAll().map((v) => (
+                    <option value={v.name}>{v.name}</option>
                   ))}
                 </select>
               </td>
