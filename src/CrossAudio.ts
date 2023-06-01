@@ -14,7 +14,7 @@ export default {
     setActiveVoice: (v: string | undefined) => void
   ) => {
     let audioIds = c.voices.map((voice) => [voice, phrase] as [string, string]);
-    return AudioOutput.playSequentially(
+    return AudioOutput.playMomentsInSequence(
       audioIds.map((ids) => [ids]),
       (i) => {
         if (i === undefined) {
@@ -33,7 +33,7 @@ export default {
     let audioIds = c.phrases.map(
       (phrase) => [voice, phrase] as [string, string]
     );
-    return AudioOutput.playSequentially(
+    return AudioOutput.playMomentsInSequence(
       audioIds.map((ids) => [ids]),
       (i) => {
         if (i === undefined) {

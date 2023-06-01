@@ -13,7 +13,7 @@ export default {
     conversation: Conversation,
     setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
   ): Promise<void> =>
-    AudioOutput.playSequentially(
+    AudioOutput.playMomentsInSequence(
       conversation.utteranceMoments.map((um) =>
         momentAudioIds(conversation, um)
       ),
