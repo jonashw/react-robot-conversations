@@ -1,7 +1,7 @@
 import Avatar from "./Avatar";
 import VoiceBadges from "./VoiceBadges";
 
-import {Utterance, Voice} from "../Model";
+import { Utterance, Voice } from "../Model";
 export default ({
   voices,
   phrases,
@@ -35,7 +35,7 @@ export default ({
         <div>
           <div>
             {phrases.map((p) => (
-              <div>
+              <div className="text-end">
                 <button
                   className={
                     (!!active && active.voice === v && active.phrase === p

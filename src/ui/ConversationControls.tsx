@@ -1,5 +1,7 @@
 import React, { DependencyList, EffectCallback } from "react";
 import ConversationEditor from "./ConversationEditor";
+import ConversationSideEffects from "./ConversationSideEffects";
+
 import Stage from "./Stage";
 import {
   Voice,
@@ -32,6 +34,12 @@ export default ({
       );
     }
   }, [conversation]);
+
+  let effects = new ConversationSideEffects(
+    voiceIndex,
+    conversation,
+    (prev: Conversation, next: Conversation) => updateVoiceBoard(prev, next)
+  );
 
   type BoardControlState = "editing" | "playing" | "script";
 
@@ -140,8 +148,7 @@ export default ({
           {...{
             conversation,
             voiceIndex,
-            updateConversation: (prev: Conversation, next: Conversation) =>
-              updateVoiceBoard(prev, next),
+            effect: effects,
             activeUtteranceMoment: activeUtteranceMoment,
             setActiveUtteranceMoment: setActiveUtteranceMoment,
           }}
