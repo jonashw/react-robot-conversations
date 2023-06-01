@@ -28,7 +28,7 @@ export default ({
               {activeUtteranceMoment !== undefined &&
                 c in activeUtteranceMoment.utteranceByCharacter && (
                   <div className="alert alert-primary mt-3">
-                    {activeUtteranceMoment.utteranceByCharacter[c].label}
+                    {activeUtteranceMoment.utteranceByCharacter[c].phrase}
                   </div>
                 )}
             </div>
@@ -64,7 +64,7 @@ export default ({
               {activeUtteranceMoment !== undefined &&
                 c in activeUtteranceMoment.utteranceByCharacter && (
                   <div className="alert alert-primary mt-3">
-                    {activeUtteranceMoment.utteranceByCharacter[c].label}
+                    {activeUtteranceMoment.utteranceByCharacter[c].phrase}
                   </div>
                 )}
             </div>

@@ -19,7 +19,7 @@ export default ({ simple }: { simple: Simple }) => {
             style={{ height: `calc((100vh - 8em)/${simple.phrases.length})` }}
             className={"btn btn-lg " + btnClass}
             onClick={() =>
-              CrossAudio.playUtterance({ label: p, voice: simple.voice })
+              CrossAudio.playUtterance({ phrase: p, voice: simple.voice })
             }
           >
             {p}

@@ -24,7 +24,9 @@ export default ({
     for (let characterId of Object.keys(conversation.characters)) {
       let substantiveUtterancesByThisCharacter = conversation.utteranceMoments
         .filter((um) => um !== activeUtteranceMoment)
-        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
+        .map((um) =>
+          (um.utteranceByCharacter[characterId]?.phrase || "").trim()
+        )
         .filter((msg) => msg.length > 0);
       console.log({ substantiveUtterancesByThisCharacter });
       if (
@@ -115,16 +117,18 @@ export default ({
         utteranceByCharacter: {
           ...moment.utteranceByCharacter,
           [characterId]: {
-            voice: conversation.characters[characterId].voice,
-            label: message,
+            voice: voiceIndex.getById(
+              conversation.characters[characterId].voice
+            ),
+            phrase: message,
           } as Utterance,
         },
       };
       let substantiveUtterancesInTheMoment = Object.entries(
         updatedMoment.utteranceByCharacter
       )
-        .map(([s, u]) => ({ ...u, label: (u.label || "").trim() }))
-        .filter(({ label }) => label !== "");
+        .map(([s, u]) => ({ ...u, phrase: (u.phrase || "").trim() }))
+        .filter(({ phrase }) => phrase !== "");
 
       if (
         substantiveUtterancesInTheMoment.length === 0 &&
@@ -145,7 +149,9 @@ export default ({
         utteranceMoments: updatedUtteranceMoments,
       });
       let substantiveUtterancesByThisCharacter = updatedUtteranceMoments
-        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
+        .map((um) =>
+          (um.utteranceByCharacter[characterId]?.phrase || "").trim()
+        )
         .filter((msg) => msg.length > 0);
       console.log({ substantiveUtterancesByThisCharacter });
       if (
@@ -342,7 +348,7 @@ export default ({
                     style={{ fontSize: "0.75em" }}
                   >
                     <textarea
-                      defaultValue={moment.utteranceByCharacter[c]?.label}
+                      defaultValue={moment.utteranceByCharacter[c]?.phrase}
                       onBlur={(e) =>
                         setCharacterUtterance(c, moment, e.target.value)
                       }

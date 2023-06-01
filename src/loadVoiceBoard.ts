@@ -7,6 +7,7 @@ import {
   VoiceIndex,
   Character,
   Audition,
+  AuditionVoices,
   FacetedSpecification,
   Voice,
 } from "./Model";
@@ -60,18 +61,23 @@ export const parseConversationText = (
     [characterId]: phrase,
   }));
   console.log({ sections, utterances, characters, script });
-  let vb: VoiceBoard = loadVoiceBoard(900, {
-    name: "pasted",
-    type: "conversation",
-    script,
-    characters,
-  });
+  let vb: VoiceBoard = loadVoiceBoard(
+    900,
+    {
+      name: "pasted",
+      type: "conversation",
+      script,
+      characters,
+    },
+    voiceIndex
+  );
   return vb;
 };
 
 export const loadVoiceBoard = (
   id: number,
-  vbs: SketchSpecification
+  vbs: SketchSpecification,
+  voiceIndex: VoiceIndex
 ): VoiceBoard => {
   const interpolateCharacterNamesInMessage = (() => {
     let replacementFns =
@@ -87,20 +93,25 @@ export const loadVoiceBoard = (
   })();
   switch (vbs.type) {
     case "audition":
-      let audition = vbs as Audition;
-      let { name, type, phrases, voiceSpecifications } = audition;
+      let auditionVoices: AuditionVoices<Voice> =
+        vbs.voices.type === "just-an-array"
+          ? {
+              type: "just-an-array",
+              array: vbs.voices.array.map((id) => voiceIndex.getById(id)),
+            }
+          : vbs.voices;
       return {
         id,
-        type,
-        name,
-        phrases,
-        voiceSpecifications,
+        type: "audition",
+        name: vbs.name,
+        phrases: vbs.phrases,
+        voices: auditionVoices,
       };
     case "simple":
       return {
         name: vbs.name,
         id,
-        voice: vbs.voice,
+        voice: voiceIndex.getById(vbs.voice),
         type: "simple",
         phrases: vbs.phrases,
       };
@@ -117,8 +128,8 @@ export const loadVoiceBoard = (
               let finalMessage = interpolateCharacterNamesInMessage(msg);
 
               let utt: Utterance = {
-                label: finalMessage,
-                voice: character.voice,
+                phrase: finalMessage,
+                voice: voiceIndex.getById(character.voice),
               };
               return [c, utt] as [string, Utterance];
             })
@@ -138,15 +149,6 @@ export const loadVoiceBoard = (
         characters: vbs.characters,
         type: "conversation",
         utteranceMoments,
-      };
-
-    case "cross":
-      return {
-        name: vbs.name,
-        id,
-        voices: vbs.voices,
-        phrases: vbs.phrases,
-        type: "cross",
       };
   }
 };

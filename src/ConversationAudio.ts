@@ -6,7 +6,7 @@ let momentAudioIds = (
 ): [string, string][] =>
   Object.entries(m.utteranceByCharacter).map(
     ([characterId, u]) =>
-      [c.characters[characterId].voice, u.label] as [string, string]
+      [c.characters[characterId].voice, u.phrase] as [string, string]
   );
 export default {
   play: (

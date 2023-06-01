@@ -1,40 +1,4 @@
-import {
-  SketchSpecification,
-  VoiceIndex,
-  Audition,
-  VoiceBoard,
-  Voice,
-} from "./Model";
-
-const englishSpeakers = (voiceIndex: VoiceIndex): SketchSpecification => {
-  let phrases = [
-    "Yes",
-    "No",
-    "Maybe",
-    "Hello",
-    "What?",
-    "Oh",
-    "OK",
-    "Let's go",
-    "How are you?",
-    "I'm fine",
-  ];
-  let voices = Object.values(voiceIndex);
-  let englishLanguages = voices.reduce((langs, v) => {
-    if (v.lang.indexOf("English") > -1) {
-      langs.add(v.lang);
-    }
-    return langs;
-  }, new Set<string>());
-  return {
-    type: "cross",
-    phrases: phrases,
-    voices: voices
-      .filter((v) => englishLanguages.has(v.lang))
-      .map((v) => v.name),
-    name: "English Speakers",
-  };
-};
+import { SketchSpecification } from "./Model";
 
 const rowYourBoat = (oneBeatPerPhrase = true): SketchSpecification => {
   let phrases = [
@@ -122,5 +86,4 @@ const rowYourBoat = (oneBeatPerPhrase = true): SketchSpecification => {
 
 export default {
   rowYourBoat,
-  englishSpeakers,
 };

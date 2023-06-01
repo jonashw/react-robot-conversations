@@ -13,13 +13,13 @@ import ConversationAudio from "../ConversationAudio";
 
 export default ({
   conversation,
-  voices,
+  voiceIndex,
   updateVoiceBoard,
   activeUtteranceMoment,
   setActiveUtteranceMoment,
 }: {
   conversation: Conversation;
-  voices: VoiceIndex;
+  voiceIndex: VoiceIndex;
   updateVoiceBoard: (prev: VoiceBoard, next: VoiceBoard) => void;
   activeUtteranceMoment: UtteranceMoment | undefined;
   setActiveUtteranceMoment: (u: UtteranceMoment | undefined) => void;
@@ -86,7 +86,7 @@ export default ({
                       >
                         <th>{conversation.characters[c].name}</th>
                         <td style={{ width: "70%", textAlign: "left" }}>
-                          {u.label}
+                          {u.phrase}
                         </td>
                       </tr>
                     )
@@ -139,7 +139,7 @@ export default ({
         <ConversationEditor
           {...{
             conversation,
-            voiceIndex: voices,
+            voiceIndex,
             updateConversation: (prev: Conversation, next: Conversation) =>
               updateVoiceBoard(prev, next),
             activeUtteranceMoment: activeUtteranceMoment,

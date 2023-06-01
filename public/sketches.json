@@ -2,10 +2,13 @@
   {
     "name": "Audition for the part of Captain Underpants",
     "type": "audition",
-    "voiceSpecifications": {
-      "lang": ["US English", "British English", "Australian English"],
-      "gender": ["Male"],
-      "age": ["Adult"]
+    "voices": {
+      "type": "faceted-specification",
+      "facetedSpecification": {
+        "lang": ["US English", "British English", "Australian English"],
+        "gender": ["Male"],
+        "age": ["Adult"]
+      }
     },
     "phrases": [
       "Tralalaaaa",
@@ -162,8 +165,11 @@
   },
   {
     "name": "Random 2",
-    "type": "cross",
-    "voices": ["Brian", "Matthew"],
+    "type": "audition",
+    "voices": {
+      "type": "just-an-array",
+      "array": ["Brian", "Matthew"]
+    },
     "phrases": [
       "yes, of course.",
       "no, I don't think so.",
@@ -179,8 +185,11 @@
   },
   {
     "name": "Random 1",
-    "type": "cross",
-    "voices": ["Ivy", "Justin", "Salli", "Matthew"],
+    "type": "audition",
+    "voices": {
+      "type": "just-an-array",
+      "array": ["Ivy", "Justin", "Salli", "Matthew"]
+    },
     "phrases": [
       "Yes",
       "No",
