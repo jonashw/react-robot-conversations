@@ -1,4 +1,11 @@
-import { SketchSpecification, VoiceIndex } from "./Model";
+import {
+  SketchSpecification,
+  VoiceIndex,
+  Audition,
+  VoiceBoard,
+  Voice,
+} from "./Model";
+
 const englishSpeakers = (voiceIndex: VoiceIndex): SketchSpecification => {
   let phrases = [
     "Yes",

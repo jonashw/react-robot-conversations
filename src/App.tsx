@@ -5,6 +5,7 @@ import DarkModeToggle from "./ui/DarkModeToggle";
 import VoiceBoardSelector from "./ui/VoiceBoardSelector";
 import PlayPause from "./ui/PlayPause";
 import SimpleControls from "./ui/SimpleControls";
+import AuditionControls from "./ui/AuditionControls";
 import {
   Voice,
   SketchSpecification,
@@ -13,6 +14,7 @@ import {
   Utterance,
   UtteranceMoment,
   Simple,
+  Audition,
 } from "./Model";
 import CrossControls from "./ui/CrossControls";
 import ConversationControls from "./ui/ConversationControls";
@@ -156,6 +158,19 @@ export default function App() {
                 case "simple":
                   let simple: Simple = activeVoiceBoard;
                   return <SimpleControls simple={simple} />;
+                case "audition":
+                  return (
+                    <AuditionControls
+                      audition={activeVoiceBoard as Audition}
+                      setAudition={(
+                        oldAudition: Audition,
+                        newAudition: Audition
+                      ) => {
+                        updateVoiceBoard(oldAudition, newAudition);
+                      }}
+                      voiceIndex={voices}
+                    />
+                  );
                 default:
                   assertUnreachable(activeVoiceBoard);
                   break;

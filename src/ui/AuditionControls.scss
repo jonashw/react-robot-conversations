@@ -1,0 +1,81 @@
+.speech-bubble {
+  position: relative;
+  border-radius: 0.4em;
+}
+@mixin speech-bubble-variant(
+  $color-variant,
+  $bubble-position,
+  $arrow-color,
+  $arrow-dir,
+  $margin-y-dir,
+  $margin-x-dir,
+  $principal-layout-dir
+) {
+  $opposites: (
+    "top": "bottom",
+    "bottom": "top",
+    "left": "right",
+    "right": "left",
+  );
+  $opposite-dir: map-get($opposites, $bubble-position);
+  $caret-position: $opposite-dir;
+  .speech-bubble.speech-bubble-#{$color-variant}.speech-bubble-#{$bubble-position} {
+    &:after {
+      content: "";
+      position: absolute;
+      #{map-get($opposites,$arrow-dir)}: 0;
+      #{$principal-layout-dir}: 50%;
+      width: 0;
+      height: 0;
+      border: 20px solid transparent;
+      border-#{$bubble-position}-color: $arrow-color;
+      border-#{$opposite-dir}: 0;
+      margin-#{$margin-x-dir}: -20px;
+      margin-#{$margin-y-dir}: -20px;
+    }
+  }
+}
+
+$btn-variants: (
+  "primary": #0d6efd,
+  "info": green,
+);
+
+@each $variant, $arrow-color in $btn-variants {
+  @include speech-bubble-variant(
+    $variant,
+    "right",
+    $arrow-color,
+    right,
+    top,
+    left,
+    top
+  );
+  @include speech-bubble-variant(
+    $variant,
+    "left",
+    $arrow-color,
+    left,
+    top,
+    right,
+    top
+  );
+  @include speech-bubble-variant(
+    $variant,
+    "top",
+    $arrow-color,
+    top,
+    bottom,
+    left,
+    left
+  );
+  @include speech-bubble-variant(
+    $variant,
+    "bottom",
+    $arrow-color,
+    bottom,
+    top,
+    left,
+    left
+  );
+}

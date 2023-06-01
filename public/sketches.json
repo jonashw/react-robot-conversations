@@ -1,5 +1,23 @@
 [
   {
+    "name": "Audition for the part of Captain Underpants",
+    "type": "audition",
+    "voiceSpecifications": {
+      "lang": ["US English", "British English", "Australian English"],
+      "gender": ["Male"],
+      "age": ["Adult"]
+    },
+    "phrases": [
+      "Hello, what's crackin'",
+      "Isn't the weather nice today?",
+      "Are you coming to the party yesterday?  Hop in. I'll give you a ride in my time machine.",
+      "My lasagna is in the lasagna oven.  My casserole is in the casserole oven.",
+      "Ouch!  You're standing on my foot.",
+      "Pirahnas pickles pizza. Yum!",
+      "NO NO NO NO NO!"
+    ]
+  },
+  {
     "name": "Bluey and Bandit's Yes/No buttons",
     "type": "simple",
     "voice": "Brian",

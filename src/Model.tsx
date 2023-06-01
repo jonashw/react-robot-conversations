@@ -1,3 +1,38 @@
+export type VoiceBoard = Cross | Conversation | Simple | Audition;
+export type Simple = {
+  name: string;
+  id: number;
+  type: "simple";
+  voice: string;
+  phrases: string[];
+};
+export type Cross = {
+  name: string;
+  id: number;
+  type: "cross";
+  voices: string[];
+  phrases: string[];
+};
+
+export type Conversation = {
+  name: string;
+  id: number;
+  type: "conversation";
+  utteranceMoments: UtteranceMoment[];
+  characters: {
+    [id: CharacterId]: Character;
+  };
+};
+export type Audition = {
+  id: number;
+  name: string;
+  type: "audition";
+  voiceSpecifications: { [facetId: string]: string[] };
+  phrases: string[];
+};
+
+export type FacetedSpecification = { [key: string]: string[] };
+
 export type Voice = {
   name: string;
   lang: string;
@@ -8,6 +43,11 @@ export type Voice = {
 export type VoiceIndex = { [name: string]: Voice };
 export type UtteranceId = [string, string];
 export type SketchSpecification =
+  | {
+      type: "audition";
+      voiceSpecifications: { [facetId: string]: string[] };
+      phrases: string[];
+    }
   | {
       type: "simple";
       name: string;
@@ -36,31 +76,6 @@ export type UtteranceMoment = {
   utteranceByCharacter: UtteranceByCharacter;
   id: string;
 };
-export type Simple = {
-  name: string;
-  id: number;
-  type: "simple";
-  voice: string;
-  phrases: string[];
-};
-export type Cross = {
-  name: string;
-  id: number;
-  type: "cross";
-  voices: string[];
-  phrases: string[];
-};
-
-export type Conversation = {
-  name: string;
-  id: number;
-  type: "conversation";
-  utteranceMoments: UtteranceMoment[];
-  characters: {
-    [id: CharacterId]: Character;
-  };
-};
-export type VoiceBoard = Cross | Conversation | Simple;
 
 export type Utterance = {
   voice: string;

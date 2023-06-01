@@ -1,6 +1,6 @@
 import React from "react";
 import { Voice } from "../Model";
-
+import VoiceBadges from "./VoiceBadges";
 export default ({
   voices,
   selected,
@@ -39,13 +39,7 @@ export default ({
                 borderLeft: "none",
               }}
             >
-              {[
-                (v: Voice) => v.age,
-                (v: Voice) => v.gender,
-                (v: Voice) => v.lang,
-              ].map((key) => (
-                <span className="badge text-bg-light me-1">{key(voice)}</span>
-              ))}
+              <VoiceBadges voice={voice} />
             </td>
           </tr>
         ))}

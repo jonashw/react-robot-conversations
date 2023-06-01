@@ -1,4 +1,3 @@
-import AudioRepository from "./AudioRepository";
 import {
   SketchSpecification,
   VoiceBoard,
@@ -7,6 +6,9 @@ import {
   UtteranceByCharacter,
   VoiceIndex,
   Character,
+  Audition,
+  FacetedSpecification,
+  Voice,
 } from "./Model";
 
 export const parseConversationText = (
@@ -84,6 +86,16 @@ export const loadVoiceBoard = (
       replacementFns.reduce((msg, replace) => replace(msg), msg);
   })();
   switch (vbs.type) {
+    case "audition":
+      let audition = vbs as Audition;
+      let { name, type, phrases, voiceSpecifications } = audition;
+      return {
+        id,
+        type,
+        name,
+        phrases,
+        voiceSpecifications,
+      };
     case "simple":
       return {
         name: vbs.name,
