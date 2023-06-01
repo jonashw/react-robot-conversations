@@ -1,6 +1,7 @@
 import React from "react";
 import AudioRepository from "../AudioRepository";
 import { UtteranceMoment, Character } from "../Model";
+import Avatar from "./Avatar";
 
 export default ({
   focusOnSpeakers,
@@ -19,16 +20,15 @@ export default ({
         <div className="d-flex justify-content-evenly text-center">
           {Object.keys(activeUtteranceMoment.utteranceByCharacter).map((c) => (
             <div>
-              <div className="me-2">
-                <div style={{ fontSize: "5rem" }}>
-                  {characters[c].emoji || "👤"}
-                </div>
-                {characters[c].name}
-              </div>
+              <Avatar
+                emoji={characters[c].emoji}
+                name={characters[c].name}
+                size={"lg"}
+              />
               {activeUtteranceMoment !== undefined &&
                 c in activeUtteranceMoment.utteranceByCharacter && (
                   <div className="alert alert-primary mt-3">
-                    {activeUtteranceMoment.utteranceByCharacter[c].label}
+                    {activeUtteranceMoment.utteranceByCharacter[c].phrase}
                   </div>
                 )}
             </div>
@@ -37,6 +37,7 @@ export default ({
       </div>
     );
   }
+
   const characterSaysItsOwnVoice = (character: Character) => {
     AudioRepository.getAudioBlob([character.voice, character.name]).then(
       (blob) => {
@@ -63,7 +64,7 @@ export default ({
               {activeUtteranceMoment !== undefined &&
                 c in activeUtteranceMoment.utteranceByCharacter && (
                   <div className="alert alert-primary mt-3">
-                    {activeUtteranceMoment.utteranceByCharacter[c].label}
+                    {activeUtteranceMoment.utteranceByCharacter[c].phrase}
                   </div>
                 )}
             </div>

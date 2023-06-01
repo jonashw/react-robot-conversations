@@ -5,6 +5,7 @@ import DarkModeToggle from "./ui/DarkModeToggle";
 import VoiceBoardSelector from "./ui/VoiceBoardSelector";
 import PlayPause from "./ui/PlayPause";
 import SimpleControls from "./ui/SimpleControls";
+import AuditionControls from "./ui/AuditionControls";
 import {
   Voice,
   SketchSpecification,
@@ -13,8 +14,8 @@ import {
   Utterance,
   UtteranceMoment,
   Simple,
+  Audition,
 } from "./Model";
-import CrossControls from "./ui/CrossControls";
 import ConversationControls from "./ui/ConversationControls";
 import { loadVoiceBoard } from "./loadVoiceBoard";
 
@@ -25,8 +26,9 @@ function assertUnreachable(x: never): never {
 export default function App() {
   const [preventUtteranceOverlap, setPreventUtteranceOverlap] =
     React.useState(true);
-  const [voices, setVoices] = React.useState<VoiceIndex>({});
-  const voiceIndex = voices;
+  const [voiceIndex, setVoiceIndex] = React.useState<VoiceIndex | undefined>(
+    undefined
+  );
   const [activeVoiceBoard, setActiveVoiceBoard] = React.useState<
     VoiceBoard | undefined
   >(undefined);
@@ -49,28 +51,30 @@ export default function App() {
         "https://storage.googleapis.com/jonashw-dev-speech-synthesis/index.json?v8"
       );
       let voices: Voice[] = await result.json();
-      setVoices(Object.fromEntries(voices.map((v) => [v.name, v])));
+      setVoiceIndex(new VoiceIndex(voices));
     }
     effect();
   }, []);
 
   React.useEffect(() => {
-    if (Object.keys(voices).length === 0) {
+    if (voiceIndex === undefined) {
       return;
     }
     async function effect() {
       let result = await fetch("/sketches.json");
       let specs: SketchSpecification[] = [
-        Generator.englishSpeakers(voices),
         Generator.rowYourBoat(true),
         Generator.rowYourBoat(false),
         ...(await result.json()),
       ];
-      let voiceBoards = specs.map((spec, i) => loadVoiceBoard(i + 1, spec));
+      console.log({ specs });
+      let voiceBoards = specs.map((spec, i) =>
+        loadVoiceBoard(i + 1, spec, voiceIndex!)
+      );
       setVoiceBoards(voiceBoards);
     }
     effect();
-  }, [voices]);
+  }, [voiceIndex]);
 
   const updateVoiceBoard = (prev: VoiceBoard, next: VoiceBoard) => {
     setVoiceBoards(voiceBoards.map((vb) => (vb === prev ? next : vb)));
@@ -82,7 +86,7 @@ export default function App() {
 
   return (
     <div style={{ height: "100vw" }}>
-      {!activeVoiceBoard && (
+      {!activeVoiceBoard && !!voiceIndex && (
         <>
           <nav className="navbar bg-body-tertiary mb-2">
             <div className="container-fluid">
@@ -108,7 +112,7 @@ export default function App() {
         <div style={{ flexGrow: 1 }}>
           <nav
             className="navbar bg-body-tertiary mb-2"
-            style={{ position: "sticky", top: "0", zIndex: 1000 }}
+            style={{ position: "sticky", top: "0", zIndex: 3000 }}
           >
             <form
               className="container-fluid justify-content-between"
@@ -139,23 +143,28 @@ export default function App() {
                   return (
                     <ConversationControls
                       conversation={activeVoiceBoard}
-                      voices={voices}
+                      voiceIndex={voiceIndex!}
                       updateVoiceBoard={updateVoiceBoard}
                       activeUtteranceMoment={activeUtteranceMoment}
                       setActiveUtteranceMoment={setActiveUtteranceMoment}
                     />
                   );
-                case "cross":
-                  return (
-                    <CrossControls
-                      voices={voices}
-                      preventUtteranceOverlap={preventUtteranceOverlap}
-                      cross={activeVoiceBoard}
-                    />
-                  );
                 case "simple":
                   let simple: Simple = activeVoiceBoard;
                   return <SimpleControls simple={simple} />;
+                case "audition":
+                  return (
+                    <AuditionControls
+                      audition={activeVoiceBoard as Audition}
+                      setAudition={(
+                        oldAudition: Audition,
+                        newAudition: Audition
+                      ) => {
+                        updateVoiceBoard(oldAudition, newAudition);
+                      }}
+                      voiceIndex={voiceIndex!}
+                    />
+                  );
                 default:
                   assertUnreachable(activeVoiceBoard);
                   break;

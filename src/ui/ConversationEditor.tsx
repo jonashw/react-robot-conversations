@@ -7,157 +7,23 @@ import {
   VoiceIndex,
 } from "../Model";
 import ConversationAudio from "../ConversationAudio";
+import ConversationSideEffects from "./ConversationSideEffects";
+
 export default ({
   voiceIndex,
   conversation,
-  updateConversation,
   activeUtteranceMoment,
   setActiveUtteranceMoment,
+  effect,
 }: {
   voiceIndex: VoiceIndex;
   conversation: Conversation;
-  updateConversation: (prev: Conversation, next: Conversation) => void;
   activeUtteranceMoment: UtteranceMoment | undefined;
   setActiveUtteranceMoment: (aum: UtteranceMoment | undefined) => void;
+  effect: ConversationSideEffects;
 }) => {
-  const removeCharacterIfDead = (characterId: string) => {
-    for (let characterId of Object.keys(conversation.characters)) {
-      let substantiveUtterancesByThisCharacter = conversation.utteranceMoments
-        .filter((um) => um !== activeUtteranceMoment)
-        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
-        .filter((msg) => msg.length > 0);
-      console.log({ substantiveUtterancesByThisCharacter });
-      if (
-        substantiveUtterancesByThisCharacter.length === 0 &&
-        confirm(
-          `Character "${characterId}" no longer has a speaking moment.  Remove?`
-        )
-      ) {
-        removeCharacter(characterId);
-      }
-    }
-  };
-
   let characterIds = Object.keys(conversation.characters);
-  const updateCharacter = (characterId: string, next: Character) => {
-    updateConversation(conversation, {
-      ...conversation,
-      characters: { ...conversation.characters, [characterId]: next },
-    });
-  };
-  const removeCharacter = (characterId: string) => {
-    let updatedCharacters = { ...conversation.characters };
-    delete updatedCharacters[characterId];
-    let updatedMoments = [...conversation.utteranceMoments];
-    for (let m of updatedMoments) {
-      delete m.utteranceByCharacter[characterId];
-    }
-    updatedMoments = updatedMoments.filter(
-      (m) => Object.keys(m.utteranceByCharacter).length > 0
-    );
-    updateConversation(conversation, {
-      ...conversation,
-      characters: updatedCharacters,
-      utteranceMoments: updatedMoments,
-    });
-  };
-  const removeMoment = (momentToRemove: UtteranceMoment) => {
-    updateConversation(conversation, {
-      ...conversation,
-      utteranceMoments: conversation.utteranceMoments.filter(
-        (moment) => moment !== momentToRemove
-      ),
-    });
-  };
-  const addMoment = () => {
-    let updatedConversation = {
-      ...conversation,
-      utteranceMoments: [
-        ...conversation.utteranceMoments,
-        {
-          utteranceByCharacter: {},
-          id: Math.random().toString(),
-        },
-      ],
-    };
-    updateConversation(conversation, updatedConversation);
-  };
-  const moveMoment = (moment: UtteranceMoment, direction: "up" | "down") => {
-    let prevIndex = conversation.utteranceMoments.indexOf(moment);
-    if (prevIndex === -1) {
-      return;
-    }
-    let indexOffset = direction === "up" ? -1 : 1;
-    let nextIndex = prevIndex + indexOffset;
-    if (nextIndex >= conversation.utteranceMoments.length) {
-      nextIndex = prevIndex;
-    }
-    if (nextIndex < 0) {
-      nextIndex = 0;
-    }
-    let updatedMoments = [...conversation.utteranceMoments];
-    let otherMoment = updatedMoments[nextIndex];
-    updatedMoments[nextIndex] = moment;
-    updatedMoments[prevIndex] = otherMoment;
-    updateConversation(conversation, {
-      ...conversation,
-      utteranceMoments: updatedMoments,
-    });
-  };
-  const setCharacterUtterance = (
-    characterId: string,
-    moment: UtteranceMoment,
-    message: string
-  ) => {
-    {
-      let updatedMoment: UtteranceMoment | undefined = {
-        ...moment,
-        utteranceByCharacter: {
-          ...moment.utteranceByCharacter,
-          [characterId]: {
-            voice: conversation.characters[characterId].voice,
-            label: message,
-          } as Utterance,
-        },
-      };
-      let substantiveUtterancesInTheMoment = Object.entries(
-        updatedMoment.utteranceByCharacter
-      )
-        .map(([s, u]) => ({ ...u, label: (u.label || "").trim() }))
-        .filter(({ label }) => label !== "");
 
-      if (
-        substantiveUtterancesInTheMoment.length === 0 &&
-        confirm("Nobody is talking in this moment.  Remove?")
-      ) {
-        updatedMoment = undefined;
-      }
-      let updatedUtteranceMoments = conversation.utteranceMoments
-        .map((um) => (um === moment ? updatedMoment : um))
-        .filter((um) => um !== undefined)
-        .map((um) => um as UtteranceMoment);
-
-      if (message.trim().length === 0) {
-        delete updatedMoment?.utteranceByCharacter[characterId];
-      }
-      updateConversation(conversation, {
-        ...conversation,
-        utteranceMoments: updatedUtteranceMoments,
-      });
-      let substantiveUtterancesByThisCharacter = updatedUtteranceMoments
-        .map((um) => (um.utteranceByCharacter[characterId]?.label || "").trim())
-        .filter((msg) => msg.length > 0);
-      console.log({ substantiveUtterancesByThisCharacter });
-      if (
-        substantiveUtterancesByThisCharacter.length === 0 &&
-        confirm(
-          `Character "${conversation.characters[characterId].name}" no longer has a speaking moment.  Remove?`
-        )
-      ) {
-        removeCharacter(characterId);
-      }
-    }
-  };
   return (
     <div>
       <input
@@ -165,7 +31,7 @@ export default ({
         className="form-control"
         defaultValue={conversation.name}
         onBlur={(e) => {
-          updateConversation(conversation, {
+          effect.updateConversation(conversation, {
             ...conversation,
             name: e.target.value,
           });
@@ -199,7 +65,7 @@ export default ({
                   type="text"
                   defaultValue={character.name}
                   onBlur={(e) =>
-                    updateCharacter(c, {
+                    effect.updateCharacter(c, {
                       ...character,
                       name: e.target.value,
                     })
@@ -220,7 +86,7 @@ export default ({
                     ).toString(),
                     voice: "Brian",
                   };
-                  updateConversation(conversation, {
+                  effect.updateConversation(conversation, {
                     ...conversation,
                     characters: {
                       ...conversation.characters,
@@ -246,7 +112,7 @@ export default ({
                     fontSize: "calc(1.375rem + 1.5vw)",
                   }}
                   onChange={(e) =>
-                    updateCharacter(c, {
+                    effect.updateCharacter(c, {
                       ...character,
                       emoji: e.target.value,
                     })
@@ -264,14 +130,14 @@ export default ({
                   className="form-control"
                   defaultValue={character.voice}
                   onChange={(e) =>
-                    updateCharacter(c, {
+                    effect.updateCharacter(c, {
                       ...character,
                       voice: e.target.value,
                     })
                   }
                 >
-                  {Object.keys(voiceIndex).map((v) => (
-                    <option value={v}>{v}</option>
+                  {voiceIndex.getAll().map((v) => (
+                    <option value={v.name}>{v.name}</option>
                   ))}
                 </select>
               </td>
@@ -286,7 +152,7 @@ export default ({
                   className="btn btn-outline-danger"
                   onClick={() => {
                     if (confirm("Are you sure?")) {
-                      removeCharacter(c);
+                      effect.removeCharacter(c);
                     }
                   }}
                 >
@@ -321,14 +187,14 @@ export default ({
                     <button
                       disabled={mi === 0}
                       className="btn btn-secondary"
-                      onClick={() => moveMoment(moment, "up")}
+                      onClick={() => effect.moveMoment(moment, "up")}
                     >
                       ↑
                     </button>
                     <button
                       disabled={mi === conversation.utteranceMoments.length - 1}
                       className="btn btn-secondary"
-                      onClick={() => moveMoment(moment, "down")}
+                      onClick={() => effect.moveMoment(moment, "down")}
                     >
                       ↓
                     </button>
@@ -342,9 +208,9 @@ export default ({
                     style={{ fontSize: "0.75em" }}
                   >
                     <textarea
-                      defaultValue={moment.utteranceByCharacter[c]?.label}
+                      defaultValue={moment.utteranceByCharacter[c]?.phrase}
                       onBlur={(e) =>
-                        setCharacterUtterance(c, moment, e.target.value)
+                        effect.setCharacterUtterance(c, moment, e.target.value)
                       }
                       rows={3}
                       className="form-control form-control-sm"
@@ -401,7 +267,7 @@ export default ({
         </tbody>
       </table>
       <div className="d-grid">
-        <button className="btn btn-primary" onClick={addMoment}>
+        <button className="btn btn-primary" onClick={effect.addMoment}>
           Add to the conversation
         </button>
       </div>

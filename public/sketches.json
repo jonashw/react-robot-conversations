@@ -1,5 +1,27 @@
 [
   {
+    "name": "Audition for the part of Captain Underpants",
+    "type": "audition",
+    "voices": {
+      "type": "faceted-specification",
+      "facetedSpecification": {
+        "lang": ["US English", "British English", "Australian English"],
+        "gender": ["Male"],
+        "age": ["Adult"]
+      }
+    },
+    "phrases": [
+      "Tralalaaaa",
+      "Hello, what's crackin'",
+      "Isn't the weather nice today?",
+      "Are you coming to the party yesterday?  Hop in. I'll give you a ride in my time machine.",
+      "My lasagna is in the lasagna oven.  My casserole is in the casserole oven.",
+      "Ouch!  You're standing on my foot.",
+      "Pirahnas pickles pizza. Yum!",
+      "NO NO NO NO NO!"
+    ]
+  },
+  {
     "name": "Bluey and Bandit's Yes/No buttons",
     "type": "simple",
     "voice": "Brian",
@@ -143,8 +165,11 @@
   },
   {
     "name": "Random 2",
-    "type": "cross",
-    "voices": ["Brian", "Matthew"],
+    "type": "audition",
+    "voices": {
+      "type": "just-an-array",
+      "array": ["Brian", "Matthew"]
+    },
     "phrases": [
       "yes, of course.",
       "no, I don't think so.",
@@ -160,8 +185,11 @@
   },
   {
     "name": "Random 1",
-    "type": "cross",
-    "voices": ["Ivy", "Justin", "Salli", "Matthew"],
+    "type": "audition",
+    "voices": {
+      "type": "just-an-array",
+      "array": ["Ivy", "Justin", "Salli", "Matthew"]
+    },
     "phrases": [
       "Yes",
       "No",

@@ -6,14 +6,14 @@ let momentAudioIds = (
 ): [string, string][] =>
   Object.entries(m.utteranceByCharacter).map(
     ([characterId, u]) =>
-      [c.characters[characterId].voice, u.label] as [string, string]
+      [c.characters[characterId].voice, u.phrase] as [string, string]
   );
 export default {
   play: (
     conversation: Conversation,
     setActiveUtteranceMoment: (um: UtteranceMoment | undefined) => void
   ): Promise<void> =>
-    AudioOutput.playSequentially(
+    AudioOutput.playMomentsInSequence(
       conversation.utteranceMoments.map((um) =>
         momentAudioIds(conversation, um)
       ),

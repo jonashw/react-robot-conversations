@@ -1,5 +1,7 @@
 import React, { DependencyList, EffectCallback } from "react";
 import ConversationEditor from "./ConversationEditor";
+import ConversationSideEffects from "./ConversationSideEffects";
+
 import Stage from "./Stage";
 import {
   Voice,
@@ -13,13 +15,13 @@ import ConversationAudio from "../ConversationAudio";
 
 export default ({
   conversation,
-  voices,
+  voiceIndex,
   updateVoiceBoard,
   activeUtteranceMoment,
   setActiveUtteranceMoment,
 }: {
   conversation: Conversation;
-  voices: VoiceIndex;
+  voiceIndex: VoiceIndex;
   updateVoiceBoard: (prev: VoiceBoard, next: VoiceBoard) => void;
   activeUtteranceMoment: UtteranceMoment | undefined;
   setActiveUtteranceMoment: (u: UtteranceMoment | undefined) => void;
@@ -32,6 +34,12 @@ export default ({
       );
     }
   }, [conversation]);
+
+  let effects = new ConversationSideEffects(
+    voiceIndex,
+    conversation,
+    (prev: Conversation, next: Conversation) => updateVoiceBoard(prev, next)
+  );
 
   type BoardControlState = "editing" | "playing" | "script";
 
@@ -86,7 +94,7 @@ export default ({
                       >
                         <th>{conversation.characters[c].name}</th>
                         <td style={{ width: "70%", textAlign: "left" }}>
-                          {u.label}
+                          {u.phrase}
                         </td>
                       </tr>
                     )
@@ -139,9 +147,8 @@ export default ({
         <ConversationEditor
           {...{
             conversation,
-            voiceIndex: voices,
-            updateConversation: (prev: Conversation, next: Conversation) =>
-              updateVoiceBoard(prev, next),
+            voiceIndex,
+            effect: effects,
             activeUtteranceMoment: activeUtteranceMoment,
             setActiveUtteranceMoment: setActiveUtteranceMoment,
           }}

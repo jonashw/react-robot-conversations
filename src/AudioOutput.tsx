@@ -19,10 +19,27 @@ export default (() => {
       })
     );
 
-  const playInParallel = (ids: [VoiceId, Message][]): Promise<void> =>
+  type UtteranceId = [VoiceId, Message];
+
+  const playInParallel = (ids: UtteranceId[]): Promise<void> =>
     Promise.all(ids.map(play)).then();
 
-  const pauseAll = (ids: [VoiceId, Message][]): Promise<void> =>
+  const playInSequence = (
+    ids: UtteranceId[],
+    setActiveIndex: (index: number | undefined) => void
+  ): Promise<void> =>
+    ids.length === 0
+      ? Promise.resolve()
+      : ids.reduce(
+          (prev: Promise<void>, id: UtteranceId, currentIndex: number) =>
+            prev.then(() => {
+              setActiveIndex(currentIndex);
+              return play(id).then(() => setActiveIndex(undefined));
+            }),
+          Promise.resolve()
+        );
+
+  const pauseAll = (ids: UtteranceId[]): Promise<void> =>
     Promise.all(ids.map(load)).then((audioElements) => {
       for (let a of audioElements) {
         a.pause();
@@ -34,7 +51,7 @@ export default (() => {
       a.pause();
     });
 
-  const playSequentially = (
+  const playMomentsInSequence = (
     ids: [VoiceId, Message][][],
     setActiveIndex: (index: number | undefined) => void
   ): Promise<void> =>
@@ -80,5 +97,13 @@ export default (() => {
       }
       console.log({ audioCache });
     });
-  return { pause, load, play, playInParallel, playSequentially, pauseAll };
+  return {
+    pause,
+    load,
+    play,
+    playInParallel,
+    playMomentsInSequence,
+    pauseAll,
+    playInSequence,
+  };
 })();
