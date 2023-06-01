@@ -110,7 +110,7 @@ export default function App() {
         <div style={{ flexGrow: 1 }}>
           <nav
             className="navbar bg-body-tertiary mb-2"
-            style={{ position: "sticky", top: "0", zIndex: 1000 }}
+            style={{ position: "sticky", top: "0", zIndex: 3000 }}
           >
             <form
               className="container-fluid justify-content-between"

@@ -20,6 +20,8 @@
   $opposite-dir: map-get($opposites, $bubble-position);
   $caret-position: $opposite-dir;
   .speech-bubble.speech-bubble-#{$color-variant}.speech-bubble-#{$bubble-position} {
+    margin-#{$opposite-dir}: 20px;
+
     &:after {
       content: "";
       position: absolute;

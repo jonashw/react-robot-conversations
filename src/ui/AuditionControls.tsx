@@ -53,6 +53,102 @@ const getMatchingVoices = (
     .filter((v) => v !== undefined);
 };
 
+const AuditionByPhrase = ({
+  phrases,
+  voices,
+}: {
+  phrases: string[];
+  voices: Voice[];
+}) => (
+  <>
+    {phrases.map((p, primaryIndex) => (
+      <div>
+        <div
+          className="d-grid"
+          style={{
+            position: "sticky",
+            top: "8em",
+            zIndex: 1000 + primaryIndex,
+            marginBottom: "-20px",
+          }}
+        >
+          <div className="btn btn-primary btn-lg speech-bubble speech-bubble-top speech-bubble-primary">
+            {p}
+          </div>
+        </div>
+
+        <div className="list-group">
+          {voices.map((v) => (
+            <div
+              className="list-group-item d-flex justify-content-between align-items-center"
+              onClick={() => Audio.playUtterance({ voice: v.name, label: p })}
+              style={{ cursor: "pointer" }}
+            >
+              <div>
+                <div className="d-flex align-items-center gap-2">
+                  <Avatar emoji={""} size="md" />
+                  <div>{v.name}</div>
+                </div>
+              </div>
+              <div>
+                <VoiceBadges
+                  voice={v}
+                  asTable={false}
+                  vertical={true}
+                  variant={"secondary"}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </>
+);
+
+const ByVoice = ({
+  voices,
+  phrases,
+}: {
+  voices: Voice[];
+  phrases: string[];
+}) => (
+  <>
+    {voices.map((v, primaryIndex) => (
+      <div>
+        <div
+          className="text-center"
+          style={{
+            background: "var(--bs-body-bg)",
+            position: "sticky",
+            top: "8em",
+            zIndex: 1000 + primaryIndex,
+          }}
+        >
+          <Avatar emoji={""} name={v.name} />
+          <VoiceBadges voice={v} />
+        </div>
+        <div className="text-end">
+          <div>
+            {phrases.map((p) => (
+              <div>
+                <button
+                  className="btn btn-primary btn-lg speech-bubble speech-bubble-right speech-bubble-primary mb-2"
+                  onClick={() =>
+                    Audio.playUtterance({ voice: v.name, label: p })
+                  }
+                >
+                  {p}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))}
+  </>
+);
+
 export default ({
   audition,
   setAudition,
@@ -68,88 +164,24 @@ export default ({
   );
   const [primaryDimension, setPrimaryDimension] =
     React.useState<string>("phrase");
-
-  const byVoice = () => (
-    <>
-      {auditioningVoices.map((v, primaryIndex) => (
-        <>
-          <div className="row">
-            <div className="col text-center">
-              <Avatar emoji={"😊"} name={v.name} />
-              <VoiceBadges voice={v} />
-            </div>
-            <div className="col">
-              <div>
-                {audition.phrases.map((p) => (
-                  <div className="row">
-                    <div className="col">
-                      <button
-                        className="btn btn-primary btn-lg speech-bubble speech-bubble-right speech-bubble-primary mb-3"
-                        onClick={() =>
-                          Audio.playUtterance({ voice: v.name, label: p })
-                        }
-                      >
-                        {p}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          {primaryIndex < auditioningVoices.length - 1 && <hr className="hr" />}
-        </>
-      ))}
-    </>
-  );
-
-  const byPhrase = () => (
-    <div>
-      {audition.phrases.map((p, primaryIndex) => (
-        <>
-          {primaryIndex > 0 && <hr className="hr border-0" />}
-          <div className="d-grid mb-4">
-            <div className="btn btn-primary btn-lg speech-bubble speech-bubble-top speech-bubble-primary">
-              {p}
-            </div>
-          </div>
-
-          <div className="list-group">
-            {auditioningVoices.map((v) => (
-              <div
-                className="list-group-item d-flex justify-content-between align-items-center"
-                onClick={() => Audio.playUtterance({ voice: v.name, label: p })}
-                style={{ cursor: "pointer" }}
-              >
-                <div>
-                  <div className="d-flex align-items-center gap-2">
-                    <Avatar emoji={"😊"} size="md" />
-                    <div>{v.name}</div>
-                  </div>
-                </div>
-                <div>
-                  <VoiceBadges
-                    voice={v}
-                    asTable={false}
-                    vertical={true}
-                    variant={"secondary"}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      ))}
-    </div>
-  );
-
+  const settings = { voices: auditioningVoices, phrases: audition.phrases };
   return (
     <div>
-      <ul className="nav nav-pills nav-fill">
+      <ul
+        className="nav nav-pills nav-fill"
+        style={{
+          position: "sticky",
+          top: "4em",
+          background: "var(--bs-body-bg)",
+          padding: "0.5em 0  1em 0",
+          margin: "-0.5em 0 -1em 0",
+          zIndex: 2000,
+        }}
+      >
         {(
           [
-            { label: "By Voice", value: "voice" },
             { label: "By Phrase", value: "phrase" },
+            { label: "By Voice", value: "voice" },
           ] as { label: string; value: "value" | "phrase" }[]
         ).map(({ label, value }) => (
           <li className="nav-item">
@@ -168,8 +200,12 @@ export default ({
           </li>
         ))}
       </ul>
-      <div className="mt-2">
-        {primaryDimension === "voice" ? byVoice() : byPhrase()}
+      <div className="mt-2" style={{ position: "relative" }}>
+        {primaryDimension === "voice" ? (
+          <ByVoice {...settings} />
+        ) : (
+          <AuditionByPhrase {...settings} />
+        )}
       </div>
     </div>
   );
