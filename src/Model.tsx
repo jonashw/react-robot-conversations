@@ -6,6 +6,12 @@ export type Audition = {
   voices: AuditionVoices<Voice>;
   phrases: string[];
 };
+export type SketchType = "simple" | "audition" | "conversation";
+export const AllSketchTypes: SketchType[] = [
+  "simple",
+  "audition",
+  "conversation",
+];
 export type Simple = {
   name: string;
   id: number;
