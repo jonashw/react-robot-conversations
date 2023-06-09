@@ -104,6 +104,12 @@ export default function App() {
                 setActiveVoiceBoard,
               }}
             />
+            <div className="p-5">
+              <img
+                src="/roboco-bg-transparent.svg"
+                className="col-6 mx-auto d-block img-fluid mb-5 pb-5"
+              />
+            </div>
           </div>
         </>
       )}
