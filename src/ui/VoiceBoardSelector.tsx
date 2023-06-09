@@ -121,6 +121,7 @@ export default ({
             }}
           >
             {vb.name}
+            <span className="float-end text-muted text-sm">{vb.type}</span>
           </a>
         ))}
       </div>
