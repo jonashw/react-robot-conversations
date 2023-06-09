@@ -14,7 +14,7 @@ export default ({
   return (
     <table
       style={{ fontSize: "0.7rem" }}
-      className="table table-sm table-bordered"
+      className="table table-sm table-bordered mt-3"
     >
       <thead>
         <tr>
