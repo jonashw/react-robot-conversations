@@ -1,19 +1,29 @@
+import React from "react";
 import Avatar from "./Avatar";
 import VoiceBadges from "./VoiceBadges";
-
 import { Utterance, Voice } from "../Model";
+import SortableListGroup from "./SortableListGroup";
+import { UniqueIdentifier } from "@dnd-kit/core";
 export default ({
   voices,
+  setVoices,
   phrases,
   active,
   playSequence,
 }: {
   voices: Voice[];
+  setVoices: (voices: Voice[]) => void;
   phrases: string[];
   active: Utterance | undefined;
   playSequence: (utterances: Utterance[]) => void;
 }) => (
   <>
+    <SortableListGroup
+      items={voices}
+      setItems={setVoices}
+      getItemLabel={(v: Voice) => v.name}
+    />
+
     {voices.map((v, primaryIndex) => (
       <div>
         <div

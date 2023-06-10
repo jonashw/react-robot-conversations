@@ -64,6 +64,7 @@ export type VoiceId = string;
 export type FacetedSpecification = { [key: string]: string[] };
 
 export type Voice = {
+  id: string;
   name: string;
   lang: string;
   age: string;
