@@ -8,6 +8,7 @@ import {
 } from "../Model";
 import ConversationAudio from "../ConversationAudio";
 import ConversationSideEffects from "./ConversationSideEffects";
+import AudioOutput from "../AudioOutput";
 
 export default ({
   voiceIndex,
@@ -148,16 +149,26 @@ export default ({
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
               <td key={character.name}>
-                <button
-                  className="btn btn-outline-danger"
-                  onClick={() => {
-                    if (confirm("Are you sure?")) {
-                      effect.removeCharacter(c);
-                    }
-                  }}
-                >
-                  &times;
-                </button>
+                <div className="d-grid gap-2">
+                  <button
+                    className="btn btn-outline-danger"
+                    onClick={() => {
+                      if (confirm("Are you sure?")) {
+                        effect.removeCharacter(c);
+                      }
+                    }}
+                  >
+                    &times;
+                  </button>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => {
+                      AudioOutput.play([character.voice, character.name]);
+                    }}
+                  >
+                    <img src="/icons/play.svg" style={{ height: "1em" }} />
+                  </button>
+                </div>
               </td>
             ))}
             <td>&nbsp;</td>
