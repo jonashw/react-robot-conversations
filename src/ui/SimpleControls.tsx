@@ -9,6 +9,8 @@ const btnClasses = [
   "btn-info",
 ];
 export default ({ simple }: { simple: Simple }) => {
+  const playPhrase = (p: string) =>
+    CrossAudio.playUtterance({ phrase: p, voice: simple.voice });
   return (
     <div className="d-flex flex-column gap-2">
       {simple.phrases.map((p, i) => {
@@ -18,9 +20,8 @@ export default ({ simple }: { simple: Simple }) => {
           <button
             style={{ height: `calc((100vh - 8em)/${simple.phrases.length})` }}
             className={"btn btn-lg " + btnClass}
-            onClick={() =>
-              CrossAudio.playUtterance({ phrase: p, voice: simple.voice })
-            }
+            onTouchStart={() => playPhrase(p)}
+            onClick={() => playPhrase(p)}
           >
             {p}
           </button>

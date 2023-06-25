@@ -51,6 +51,9 @@ export default function App() {
         "https://storage.googleapis.com/jonashw-dev-speech-synthesis/index.json?v8"
       );
       let voices: Voice[] = await result.json();
+      for (let v of voices) {
+        v.id = "amazon-polly-" + v.name;
+      }
       setVoiceIndex(new VoiceIndex(voices));
     }
     effect();

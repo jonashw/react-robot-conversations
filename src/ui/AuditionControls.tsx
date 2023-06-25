@@ -16,6 +16,18 @@ export default ({
   setAudition: (oldAudition: Audition, newAudition: Audition) => void;
   voiceIndex: VoiceIndex;
 }) => {
+  const setVoices = (voices: Voice[]) => {
+    setAudition(audition, {
+      ...audition,
+      voices: { type: "just-an-array", array: voices },
+    });
+  };
+  const setPhrases = (phrases: string[]) => {
+    setAudition(audition, {
+      ...audition,
+      phrases,
+    });
+  };
   let auditioningVoices: Voice[] =
     audition.voices.type === "faceted-specification"
       ? voiceIndex.getMatchingVoices(
@@ -84,9 +96,9 @@ export default ({
       </ul>
       <div className="mt-2" style={{ position: "relative" }}>
         {primaryDimension === "voice" ? (
-          <AuditionByVoice {...settings} />
+          <AuditionByVoice {...settings} setVoices={setVoices} />
         ) : primaryDimension === "phrase" ? (
-          <AuditionByPhrase {...settings} />
+          <AuditionByPhrase {...settings} setPhrases={setPhrases} />
         ) : (
           <AuditionMatrix {...settings} />
         )}
