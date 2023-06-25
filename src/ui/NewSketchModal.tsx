@@ -6,7 +6,10 @@ import {
   Conversation,
 } from "../Model";
 
+import Modal from "./Modal";
+
 import { loadVoiceBoard, parseConversationText } from "../loadVoiceBoard";
+
 let sampleScript = `
 Bob: Justin,👦
 Alice: Ivy,👧
@@ -113,9 +116,7 @@ export default ({
       alert("You picked " + type);
     }
   };
-  const close = () => {
-    setShown(false);
-  };
+
   const promptForPaste = () => {
     let rawScript =
       prompt("Please put your script in the box.  Thank you.", sampleScript) ||
@@ -133,54 +134,27 @@ export default ({
     }
   };
   return (
-    <>
-      <div
-        className={"modal fade" + (!!shown ? " d-block show" : "d-none")}
-        tabIndex={-1}
-        aria-modal="true"
-        role="dialog"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">New Voice Sketch</h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={close}
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-grid gap-2">
-                <p>Create by type:</p>
-                {AllSketchTypes.map((type) => (
-                  <button
-                    className="btn btn-lg btn-primary"
-                    onClick={() => selectType(type)}
-                  >
-                    {type}
-                  </button>
-                ))}
-                <hr />
-                <button
-                  className="btn btn-primary btn-lg"
-                  onClick={(e) => {
-                    promptForPaste();
-                  }}
-                >
-                  📋 Paste a script
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <Modal shown={shown} setShown={setShown} title="New Voice Sketch">
+      <div className="d-grid gap-2">
+        <p>Create by type:</p>
+        {AllSketchTypes.map((type) => (
+          <button
+            className="btn btn-lg btn-primary"
+            onClick={() => selectType(type)}
+          >
+            {type}
+          </button>
+        ))}
+        <hr />
+        <button
+          className="btn btn-primary btn-lg"
+          onClick={(e) => {
+            promptForPaste();
+          }}
+        >
+          📋 Paste a script
+        </button>
       </div>
-      <div
-        className={"modal-backdrop fade " + (shown ? "show d-block" : "d-none")}
-        onClick={close}
-      ></div>
-    </>
+    </Modal>
   );
 };

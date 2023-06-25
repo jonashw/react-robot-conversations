@@ -26,9 +26,9 @@ export default function SortableItem({
       {...attributes}
       {...listeners}
     >
-      <div className="d-flex justify-content-between">
+      <div className="d-flex">
+        <span className="me-3">↕️</span>
         {children}
-        <span>↕️</span>
       </div>
     </div>
   );

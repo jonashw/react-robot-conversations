@@ -2,6 +2,8 @@ import { Voice, Utterance } from "../Model";
 import Avatar from "./Avatar";
 import SortableListGroup from "./SortableListGroup";
 import VoiceBadges from "./VoiceBadges";
+import React from "react";
+import Modal from "./Modal";
 export default ({
   phrases,
   setPhrases,
@@ -19,13 +21,9 @@ export default ({
   let phraseItems: PhraseItem[] = phrases.map((p) => ({ id: p }));
   let setPhraseItems = (phraseItems: PhraseItem[]) =>
     setPhrases(phraseItems.map((pi) => pi.id));
+  const [sortModalShown, setSortModalShown] = React.useState<boolean>(false);
   return (
     <>
-      <SortableListGroup
-        items={phraseItems}
-        setItems={setPhraseItems}
-        getItemLabel={(pi: PhraseItem) => pi.id}
-      />
       {phrases.map((p, primaryIndex) => (
         <div>
           <div
@@ -78,6 +76,23 @@ export default ({
           </div>
         </div>
       ))}
+      <Modal
+        title="Re-order the phrases"
+        shown={sortModalShown}
+        setShown={setSortModalShown}
+      >
+        <SortableListGroup
+          items={phraseItems}
+          setItems={setPhraseItems}
+          getItemLabel={(pi: PhraseItem) => pi.id}
+        />
+      </Modal>
+      <button
+        onClick={() => setSortModalShown(true)}
+        className="btn btn-success"
+      >
+        ↕️ Re-order phrases
+      </button>
     </>
   );
 };
