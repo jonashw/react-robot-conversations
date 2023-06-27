@@ -1,65 +1,31 @@
 import { Voice, VoiceIndex, VoiceBoard, Character } from "../Model";
 import React from "react";
 import NewSketchModal from "./NewSketchModal";
+import { Link, useNavigate } from "react-router-dom";
+import { useDataService } from "../DataService";
 export default ({
-  setVoiceBoards,
   voiceBoards,
-  activeVoiceBoard,
-  setActiveVoiceBoard,
   voiceIndex,
 }: {
-  setVoiceBoards: (vbs: VoiceBoard[]) => void;
   voiceBoards: VoiceBoard[];
-  activeVoiceBoard: VoiceBoard | undefined;
-  setActiveVoiceBoard: (vb: VoiceBoard | undefined) => void;
   voiceIndex: VoiceIndex;
 }) => {
   const [modalShown, setModalShown] = React.useState<boolean>(false);
-
+  const navigate = useNavigate();
   const promptForNewSketchType = () => {
     setModalShown(true);
   };
 
+  const sketchUrl = (sketch: VoiceBoard) => `/sketches/${sketch.id}`;
+  const { addSketch } = useDataService();
   return (
     <>
-      {" "}
-      {false && (
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {voiceBoards.map((vb, i) => (
-            <button
-              key={i}
-              className={
-                "flex-grow-1 mx-1 btn " +
-                (!!activeVoiceBoard && activeVoiceBoard.id === vb.id
-                  ? "btn-primary"
-                  : "btn-outline-primary")
-              }
-              onClick={() => {
-                if (!!activeVoiceBoard && activeVoiceBoard.id === vb.id) {
-                  setActiveVoiceBoard(undefined);
-                } else {
-                  setActiveVoiceBoard(vb);
-                }
-              }}
-            >
-              {vb.id}
-            </button>
-          ))}
-        </div>
-      )}
       <div className="list-group" style={{ paddingBottom: "4em" }}>
         {voiceBoards.map((vb) => (
-          <a
-            className="list-group-item"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setActiveVoiceBoard(vb);
-            }}
-          >
+          <Link className="list-group-item" to={sketchUrl(vb)}>
             {vb.name}
             <span className="float-end text-muted text-sm">{vb.type}</span>
-          </a>
+          </Link>
         ))}
       </div>
       <NewSketchModal
@@ -67,8 +33,8 @@ export default ({
         setShown={setModalShown}
         voiceIndex={voiceIndex}
         onSketchCreated={(vb) => {
-          setVoiceBoards([...voiceBoards, vb]);
-          setActiveVoiceBoard(vb);
+          addSketch(vb);
+          navigate(sketchUrl(vb));
         }}
       />
       <div
