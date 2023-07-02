@@ -1,24 +1,24 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { VoiceBoard, VoiceIndex } from "../Model";
-import { useDataService } from "../DataService";
+import { getSketches, getVoiceIndex } from "../DataService";
 import Sketch from "../ui/Sketch";
-
+export const loader = async ({ params }: { params: any }) => {
+  let id = parseInt(params.sketch_id || "");
+  let voiceIndex = await getVoiceIndex();
+  let sketches = await getSketches(voiceIndex);
+  let sketch = sketches.filter((s) => s.id === id)[0];
+  if (!sketch) {
+    throw "Did not find sketch by id " + id;
+  }
+  return { sketch, voiceIndex };
+};
 export function SketchRoute() {
-  const params = useParams();
-  const { voiceIndex, sketches, updateSketch } = useDataService();
-  const [sketch, setSketch] = React.useState<VoiceBoard | undefined>();
+  const { sketch, voiceIndex } = useLoaderData() as {
+    sketch: VoiceBoard;
+    voiceIndex: VoiceIndex;
+  };
 
-  React.useEffect(() => {
-    let id = parseInt(params.sketch_id || "");
-    if (!sketches) {
-      return;
-    }
-    let matches = sketches.filter((s) => s.id === id);
-    if (matches.length === 1) {
-      setSketch(matches[0]);
-    }
-  }, [sketches, params]);
   return (
     <div>
       {!!sketch && !!voiceIndex ? (
@@ -26,8 +26,8 @@ export function SketchRoute() {
           sketch={sketch!}
           voiceIndex={voiceIndex!}
           updateSketch={(oldSketch: VoiceBoard, newSketch: VoiceBoard) => {
-            updateSketch(oldSketch, newSketch);
-            setSketch(newSketch);
+            //updateSketch(oldSketch, newSketch);
+            //setSketch(newSketch);
           }}
         />
       ) : (

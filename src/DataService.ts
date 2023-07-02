@@ -2,8 +2,38 @@ import { VoiceBoard, Voice, VoiceIndex, SketchSpecification } from "./Model";
 import React from "react";
 import Generator from "./Generator";
 import { loadVoiceBoard } from "./loadVoiceBoard";
+import { localStorageProperty } from "./useLocalStorage";
 
-async function getVoiceIndex() {
+const cache: {
+  voiceIndex: VoiceIndex | undefined;
+  sketches: VoiceBoard[] | undefined;
+  darkMode: boolean | undefined;
+} = {
+  voiceIndex: undefined,
+  sketches: undefined,
+  darkMode: undefined,
+};
+
+const darkMode = localStorageProperty(
+  "darkMode",
+  (b) => b.toString(),
+  (str) => str === "true",
+  false
+);
+
+export function getDarkMode() {
+  if (!!cache.darkMode) {
+    return cache.darkMode;
+  }
+  let dm = darkMode.get();
+  cache.darkMode = dm;
+  return dm;
+}
+
+export async function getVoiceIndex() {
+  if (!!cache.voiceIndex) {
+    return Promise.resolve(cache.voiceIndex);
+  }
   let result = await fetch(
     "https://storage.googleapis.com/jonashw-dev-speech-synthesis/index.json?v8"
   );
@@ -11,10 +41,17 @@ async function getVoiceIndex() {
   for (let v of voices) {
     v.id = "amazon-polly-" + v.name;
   }
-  return new VoiceIndex(voices);
+  const voiceIndex = new VoiceIndex(voices);
+  cache.voiceIndex = voiceIndex;
+  return voiceIndex;
 }
 
-async function getSketches(voiceIndex: VoiceIndex): Promise<VoiceBoard[]> {
+export async function getSketches(
+  voiceIndex: VoiceIndex
+): Promise<VoiceBoard[]> {
+  if (!!cache.sketches) {
+    return Promise.resolve(cache.sketches);
+  }
   let result = await fetch("/sketches.json");
   let specs: SketchSpecification[] = [
     Generator.rowYourBoat(true),
@@ -22,7 +59,11 @@ async function getSketches(voiceIndex: VoiceIndex): Promise<VoiceBoard[]> {
     ...(await result.json()),
   ];
   console.log({ specs });
-  return specs.map((spec, i) => loadVoiceBoard(i + 1, spec, voiceIndex));
+  let sketches = specs.map((spec, i) =>
+    loadVoiceBoard(i + 1, spec, voiceIndex)
+  );
+  cache.sketches = sketches;
+  return sketches;
 }
 
 export const useDataService = () => {
@@ -39,6 +80,16 @@ export const useDataService = () => {
   const [sketches, setSketches] = React.useState<VoiceBoard[] | undefined>(
     cache.sketches
   );
+
+  const getVoiceIndexCached = async () => {
+    if (!!cache.voiceIndex) {
+      return Promise.resolve(cache.voiceIndex!);
+    }
+    return getVoiceIndex().then((voiceIndex) => {
+      cache.voiceIndex = voiceIndex;
+      return voiceIndex;
+    });
+  };
 
   React.useEffect(() => {
     if (!!cache.voiceIndex) {
@@ -80,5 +131,5 @@ export const useDataService = () => {
     cache.sketches!.push(s);
     setSketches(cache.sketches!);
   }
-  return { voiceIndex, sketches, updateSketch, addSketch };
+  return { voiceIndex, sketches, updateSketch, addSketch, getVoiceIndexCached };
 };
