@@ -1,5 +1,5 @@
 import "./DarkModeToggle.css";
-import useLocalStorage from "../useLocalStorage";
+import { useLocalStorage } from "../useLocalStorage";
 import React from "react";
 export default ({}) => {
   const [darkMode, setDarkMode] = useLocalStorage(
@@ -23,7 +23,7 @@ export default ({}) => {
   return (
     <div onClick={() => setDarkMode(!darkMode)}>
       <img
-        style={{ height: "1.66em" }}
+        style={{ height: "1.66em", filter: `invert(${darkMode ? 1 : 0})` }}
         src={"/icons/" + (darkMode ? "dark-mode" : "light-mode") + ".svg"}
       />
     </div>
