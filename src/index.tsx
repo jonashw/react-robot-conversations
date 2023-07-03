@@ -4,6 +4,8 @@ import {
   SketchesRoute,
   loader as SketchesLoader,
 } from "./routes/SketchesRoute";
+import { SketchEditorRoute } from "./routes/SketchEditorRoute";
+import { SketchPlayerRoute } from "./routes/SketchPlayerRoute";
 import { SketchRoute, loader as SketchLoader } from "./routes/SketchRoute";
 import { loader as HomeLoader, HomeRoute } from "./routes/HomeRoute";
 import ErrorPage from "./ErrorPage";
@@ -39,7 +41,11 @@ const router = createBrowserRouter(
         path="/sketches/:sketch_id"
         loader={SketchLoader}
         element={<SketchRoute />}
-      />
+        id="sketch"
+      >
+        <Route path="play" element={<SketchPlayerRoute />} />
+        <Route path="edit" element={<SketchEditorRoute />} />
+      </Route>
     </Route>
   )
 );

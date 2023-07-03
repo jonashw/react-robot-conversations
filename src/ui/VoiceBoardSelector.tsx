@@ -16,7 +16,7 @@ export default ({
     setModalShown(true);
   };
 
-  const sketchUrl = (sketch: VoiceBoard) => `/sketches/${sketch.id}`;
+  const sketchUrl = (sketch: VoiceBoard) => `/sketches/${sketch.id}/play`;
   const { addSketch } = useDataService();
   return (
     <>
