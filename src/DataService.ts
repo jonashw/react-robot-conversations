@@ -1,4 +1,4 @@
-import { VoiceBoard, Voice, VoiceIndex, SketchSpecification } from "./Model";
+import { Sketch, Voice, VoiceIndex, SketchSpecification } from "./Model";
 import React from "react";
 import Generator from "./Generator";
 import { loadVoiceBoard } from "./loadVoiceBoard";
@@ -6,7 +6,7 @@ import { localStorageProperty } from "./useLocalStorage";
 
 const cache: {
   voiceIndex: VoiceIndex | undefined;
-  sketches: VoiceBoard[] | undefined;
+  sketches: Sketch[] | undefined;
   darkMode: boolean | undefined;
 } = {
   voiceIndex: undefined,
@@ -48,7 +48,7 @@ export async function getVoiceIndex() {
 
 export async function getSketches(
   voiceIndex: VoiceIndex
-): Promise<VoiceBoard[]> {
+): Promise<Sketch[]> {
   if (!!cache.sketches) {
     return Promise.resolve(cache.sketches);
   }
@@ -69,7 +69,7 @@ export async function getSketches(
 export const useDataService = () => {
   const cache: {
     voiceIndex: VoiceIndex | undefined;
-    sketches: VoiceBoard[] | undefined;
+    sketches: Sketch[] | undefined;
   } = {
     voiceIndex: undefined,
     sketches: undefined,
@@ -77,7 +77,7 @@ export const useDataService = () => {
   const [voiceIndex, setVoiceIndex] = React.useState<VoiceIndex | undefined>(
     cache.voiceIndex
   );
-  const [sketches, setSketches] = React.useState<VoiceBoard[] | undefined>(
+  const [sketches, setSketches] = React.useState<Sketch[] | undefined>(
     cache.sketches
   );
 
@@ -114,7 +114,7 @@ export const useDataService = () => {
     });
   }, [voiceIndex]);
 
-  function updateSketch(oldSketch: VoiceBoard, updatedSketch: VoiceBoard) {
+  function updateSketch(oldSketch: Sketch, updatedSketch: Sketch) {
     if (!sketches) {
       throw "user attempted to update a sketch before sketches were loaded";
     }
@@ -124,7 +124,7 @@ export const useDataService = () => {
     cache.sketches = updatedSketches;
     setSketches(updatedSketches);
   }
-  function addSketch(s: VoiceBoard) {
+  function addSketch(s: Sketch) {
     if (!cache.sketches) {
       throw "user attempted to add a sketch before sketches were loaded";
     }

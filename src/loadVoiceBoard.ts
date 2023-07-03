@@ -1,6 +1,6 @@
 import {
   SketchSpecification,
-  VoiceBoard,
+  Sketch,
   Utterance,
   UtteranceMoment,
   UtteranceByCharacter,
@@ -15,7 +15,7 @@ import {
 export const parseConversationText = (
   voiceIndex: VoiceIndex,
   rawScript: string
-): VoiceBoard => {
+): Sketch => {
   let sections = rawScript.split(/# ?begin script/);
 
   let voiceNames = Object.keys(voiceIndex);
@@ -61,7 +61,7 @@ export const parseConversationText = (
     [characterId]: phrase,
   }));
   console.log({ sections, utterances, characters, script });
-  let vb: VoiceBoard = loadVoiceBoard(
+  let vb: Sketch = loadVoiceBoard(
     900,
     {
       name: "pasted",
@@ -78,7 +78,7 @@ export const loadVoiceBoard = (
   id: number,
   vbs: SketchSpecification,
   voiceIndex: VoiceIndex
-): VoiceBoard => {
+): Sketch => {
   const interpolateCharacterNamesInMessage = (() => {
     let replacementFns =
       vbs.type === "conversation"

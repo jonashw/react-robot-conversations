@@ -1,4 +1,4 @@
-import { Voice, VoiceIndex, VoiceBoard, Character } from "../Model";
+import { Voice, VoiceIndex, Sketch, Character } from "../Model";
 import React from "react";
 import NewSketchModal from "./NewSketchModal";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ export default ({
   voiceBoards,
   voiceIndex,
 }: {
-  voiceBoards: VoiceBoard[];
+  voiceBoards: Sketch[];
   voiceIndex: VoiceIndex;
 }) => {
   const [modalShown, setModalShown] = React.useState<boolean>(false);
@@ -16,7 +16,7 @@ export default ({
     setModalShown(true);
   };
 
-  const sketchUrl = (sketch: VoiceBoard) => `/sketches/${sketch.id}/play`;
+  const sketchUrl = (sketch: Sketch) => `/sketches/${sketch.id}/play`;
   const { addSketch } = useDataService();
   return (
     <>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useLoaderData, Link, NavLink } from "react-router-dom";
-import { VoiceBoard, VoiceIndex } from "../Model";
+import { Sketch, VoiceIndex } from "../Model";
 import { getSketches, getVoiceIndex } from "../DataService";
 
 export const loader = async ({ params }: { params: any }) => {
@@ -18,7 +18,7 @@ export const action = async () => {};
 
 export function SketchRoute() {
   const { sketch, voiceIndex } = useLoaderData() as {
-    sketch: VoiceBoard;
+    sketch: Sketch;
     voiceIndex: VoiceIndex;
   };
 

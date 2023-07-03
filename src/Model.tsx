@@ -1,4 +1,4 @@
-export type VoiceBoard = Conversation | Simple | Audition;
+export type Sketch = Conversation | Simple | Audition;
 export type Audition = {
   id: number;
   name: string;

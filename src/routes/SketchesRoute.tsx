@@ -3,7 +3,7 @@ import DarkModeToggle from "../ui/DarkModeToggle";
 import VoiceBoardSelector from "../ui/VoiceBoardSelector";
 import { Link, useLoaderData } from "react-router-dom";
 import { getVoiceIndex, getSketches } from "../DataService";
-import { VoiceIndex, VoiceBoard } from "../Model";
+import { VoiceIndex, Sketch } from "../Model";
 export const loader = async () => {
   let voiceIndex = await getVoiceIndex();
   let sketches = await getSketches(voiceIndex);
@@ -12,7 +12,7 @@ export const loader = async () => {
 export function SketchesRoute() {
   const { voiceIndex, sketches } = useLoaderData() as {
     voiceIndex: VoiceIndex;
-    sketches: VoiceBoard[];
+    sketches: Sketch[];
   };
   return (
     <>

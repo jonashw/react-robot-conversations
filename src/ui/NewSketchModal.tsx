@@ -1,5 +1,5 @@
 import {
-  VoiceBoard,
+  Sketch,
   VoiceIndex,
   SketchType,
   AllSketchTypes,
@@ -61,7 +61,7 @@ export default ({
 }: {
   shown: boolean;
   setShown: (shown: boolean) => void;
-  onSketchCreated?: (vb: VoiceBoard) => void;
+  onSketchCreated?: (vb: Sketch) => void;
   voiceIndex: VoiceIndex;
 }) => {
   const selectType = (type: SketchType) => {
@@ -88,7 +88,7 @@ export default ({
       })),
     };
 
-    let newSketch: VoiceBoard =
+    let newSketch: Sketch =
       type === "conversation"
         ? conversation
         : type === "audition"

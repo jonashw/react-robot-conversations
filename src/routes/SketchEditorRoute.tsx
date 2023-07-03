@@ -1,14 +1,14 @@
 import React from "react";
 import { useRouteLoaderData } from "react-router-dom";
 
-import { Conversation, VoiceBoard, VoiceIndex } from "../Model";
+import { Conversation, Sketch, VoiceIndex } from "../Model";
 import ConversationEditor from "../ui/ConversationEditor";
 import ConversationSideEffects from "../ui/ConversationSideEffects";
 export const action = async () => {};
 
 export function SketchEditorRoute() {
   const { sketch, voiceIndex } = useRouteLoaderData("sketch") as {
-    sketch: VoiceBoard;
+    sketch: Sketch;
     voiceIndex: VoiceIndex;
   };
   switch (sketch.type) {

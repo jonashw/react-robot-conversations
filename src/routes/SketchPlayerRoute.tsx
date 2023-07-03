@@ -6,17 +6,11 @@ import ConversationScript from "../ui/ConversationScript";
 import SimpleControls from "../ui/SimpleControls";
 import AuditionControls from "../ui/AuditionControls";
 
-import {
-  Conversation,
-  VoiceBoard,
-  VoiceIndex,
-  Simple,
-  Audition,
-} from "../Model";
+import { Conversation, Sketch, VoiceIndex, Simple, Audition } from "../Model";
 
 export function SketchPlayerRoute() {
   const { sketch, voiceIndex } = useRouteLoaderData("sketch") as {
-    sketch: VoiceBoard;
+    sketch: Sketch;
     voiceIndex: VoiceIndex;
   };
 
