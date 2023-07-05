@@ -1,3 +1,6 @@
+import { CreateFacetedIndex } from "./FacetedIndex/FacetedIndex";
+import { FacetedIndexInstance } from "./FacetedIndex/types";
+
 export type Sketch = Conversation | Simple | Audition;
 export type Audition = {
   id: number;
@@ -72,18 +75,56 @@ export type Voice = {
 };
 
 //export type VoiceIndex = { [name: string]: Voice };
+
+export type UtteranceId = [string, string];
+
+export type Message = string;
+export type CharacterId = string;
+export type Character = { name: string; emoji?: string; voice: string };
+
+export type UtteranceMoment = {
+  utteranceByCharacter: UtteranceByCharacter;
+  id: string;
+};
+
+export type Utterance = {
+  voice: Voice;
+  phrase: string;
+};
+export type UtteranceByCharacter = { [characterId: string]: Utterance };
 export class VoiceIndex {
   private voiceById: { [voiceId: string]: Voice };
   private all: Voice[];
+  public readonly ix: FacetedIndexInstance<Voice>;
   constructor(voices: Voice[]) {
     this.voiceById = Object.fromEntries(voices.map((v) => [v.name, v]));
     this.all = voices;
+    this.ix = CreateFacetedIndex(this.all, {
+      facets: {
+        gender: {
+          name: "Gender",
+          getTermsFromRecord: (r) => [r.gender],
+        },
+        age: {
+          name: "Age",
+          getTermsFromRecord: (r) => [r.age],
+        },
+        lang: {
+          name: "Language",
+          getTermsFromRecord: (r) => [r.lang],
+        },
+      },
+      facet_term_parents: {},
+    });
   }
   getById(id: string): Voice {
     return this.voiceById[id];
   }
   getAll(): Voice[] {
     return Object.values(this.voiceById);
+  }
+  facetedSearch(voiceSpecifications: FacetedSpecification) {
+    return this.ix.search(voiceSpecifications);
   }
 
   getMatchingVoices(
@@ -126,19 +167,3 @@ export class VoiceIndex {
       .filter((v) => v !== undefined);
   }
 }
-export type UtteranceId = [string, string];
-
-export type Message = string;
-export type CharacterId = string;
-export type Character = { name: string; emoji?: string; voice: string };
-
-export type UtteranceMoment = {
-  utteranceByCharacter: UtteranceByCharacter;
-  id: string;
-};
-
-export type Utterance = {
-  voice: Voice;
-  phrase: string;
-};
-export type UtteranceByCharacter = { [characterId: string]: Utterance };
