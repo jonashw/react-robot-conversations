@@ -8,6 +8,10 @@ import { SketchEditorRoute } from "./routes/SketchEditorRoute";
 import { SketchPlayerRoute } from "./routes/SketchPlayerRoute";
 import { SketchRoute, loader as SketchLoader } from "./routes/SketchRoute";
 import { loader as HomeLoader, HomeRoute } from "./routes/HomeRoute";
+import {
+  VoiceSelectorDemoRoute,
+  loader as VoiceSelectorDemoRouteLoader,
+} from "./routes/VoiceSelectorDemoRoute";
 import ErrorPage from "./ErrorPage";
 import DarkModeToggle from "./ui/DarkModeToggle";
 import {
@@ -46,6 +50,11 @@ const router = createBrowserRouter(
         <Route path="play" element={<SketchPlayerRoute />} />
         <Route path="edit" element={<SketchEditorRoute />} />
       </Route>
+      <Route
+        path="/voice-selector-demo"
+        element={<VoiceSelectorDemoRoute />}
+        loader={VoiceSelectorDemoRouteLoader}
+      />
     </Route>
   )
 );

@@ -2,7 +2,7 @@ import Modal from "../ui/Modal";
 import React from "react";
 import { FacetedSpecification, VoiceIndex, Voice } from "../Model";
 import Select from "react-select";
-
+import "../ui/react-select.scss";
 const TermBadge = ({
   term,
   count,
@@ -25,11 +25,13 @@ export default ({
   onVoiceSelect,
   shown,
   setShown,
+  forceFilterMenuOpen,
 }: {
   voiceIndex: VoiceIndex;
   onVoiceSelect: (v: Voice) => void;
   shown: boolean;
   setShown: (s: boolean) => void;
+  forceFilterMenuOpen?: boolean;
 }) => {
   const [spec, setSpec] = React.useState<FacetedSpecification>({});
   let searchResult = voiceIndex.facetedSearch(spec);
@@ -59,7 +61,6 @@ export default ({
       setShown={setShown}
       title="Select a voice"
       scrollable
-      fullscreen
       headerContent={
         <div className="d-grid gap-2">
           <div>
@@ -67,6 +68,9 @@ export default ({
             {voiceIndex.ix.records.length} voices
           </div>
           <Select
+            menuIsOpen={forceFilterMenuOpen ? true : undefined}
+            classNamePrefix="react-select"
+            className="react-select-container"
             isMulti
             placeholder="Filter voices..."
             options={groupedTermOptions}
