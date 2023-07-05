@@ -239,6 +239,7 @@ const CreateFacetedIndex = <R>(
     },
     candidate_facet_fields,
     data: ix,
+    records,
     terms,
   };
 };

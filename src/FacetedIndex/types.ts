@@ -32,6 +32,7 @@ type FacetedIndexInstance<R> = {
   candidate_facet_fields: Set<string>;
   data: any;
   terms: any;
+  records: R[];
 };
 type FacetTermBucket = {
   name: string;

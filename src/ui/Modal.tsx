@@ -8,6 +8,7 @@ const Modal = ({
   fullscreen,
   scrollable,
   footerContent,
+  headerContent,
 }: {
   shown: boolean;
   setShown: (shown: boolean) => void;
@@ -16,6 +17,7 @@ const Modal = ({
   fullscreen?: boolean;
   scrollable?: boolean;
   footerContent?: ReactElement;
+  headerContent?: ReactElement;
 }) => {
   const close = () => {
     setShown(false);
@@ -42,7 +44,13 @@ const Modal = ({
           }
         >
           <div className="modal-content">
-            <div className="modal-header">
+            <div
+              className="modal-header"
+              style={{
+                flexFlow:
+                  "wrap" /* essential for accepting additional header content*/,
+              }}
+            >
               <h5 className="modal-title">{title}</h5>
               <button
                 type="button"
@@ -51,11 +59,14 @@ const Modal = ({
                 data-bs-dismiss="modal"
                 aria-label="Close"
               ></button>
+              {!!headerContent && <div className="w-100">{headerContent}</div>}
             </div>
             <div className="modal-body">{children}</div>
+            {!!footerContent && (
+              <div className="modal-footer">{footerContent}</div>
+            )}
           </div>
         </div>
-        {!!footerContent && <div className="modal-footer">{footerContent}</div>}
       </div>
       <div
         className={"modal-backdrop fade " + (shown ? "show d-block" : "d-none")}
