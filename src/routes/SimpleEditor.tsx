@@ -45,7 +45,7 @@ export default ({
             <th>Phrase(s)</th>
             <td>
               {sketch.phrases.map((p, i) => (
-                <div>
+                <div key={i}>
                   <input
                     type="text"
                     defaultValue={p}

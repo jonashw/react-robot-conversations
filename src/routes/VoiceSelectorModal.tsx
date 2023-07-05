@@ -1,6 +1,8 @@
 import Modal from "../ui/Modal";
 import React from "react";
 import { FacetedSpecification, VoiceIndex, Voice } from "../Model";
+import Select from "react-select";
+
 const TermBadge = ({
   term,
   count,
@@ -57,6 +59,14 @@ export default ({
       </button>
     </div>
   );
+  const groupedTermOptions = searchResult.facets.map((f) => ({
+    label: f.name,
+    options: f.term_buckets.map((tb) => ({
+      value: tb.term,
+      label: `${tb.term} (${tb.count})`,
+      facet_id: tb.facet_id,
+    })),
+  }));
   return (
     <Modal
       shown={shown}
@@ -67,42 +77,67 @@ export default ({
       footerContent={footerContent}
     >
       <>
-        {/*
-        <div className="d-flex justify-content-between">
-          {searchResult.facets.map((f) => (
-            <div>
-              {f.name}
-              <select
-                className="form-control"
-                name={f.facet_id}
-                onChange={(e) => {
-                  setSpec(
-                    voiceIndex.ix.toggleQueryTerm(
-                      spec,
-                      f.facet_id,
-                      e.target.value
-                    )
-                  );
-                }}
-              >
-                {f.term_buckets.map((tb) => (
-                  <option value={tb.term}>
-                    {tb.term} ({tb.count})
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+        <Select
+          isMulti
+          options={groupedTermOptions}
+          value={groupedTermOptions
+            .flatMap((f) => f.options)
+            .filter(
+              (o) =>
+                o.facet_id in spec && spec[o.facet_id].indexOf(o.value) > -1
+            )}
+          onChange={(e) => {
+            let selected: [string, string][] = Array.from(e.values(), (v) => [
+              v.facet_id,
+              v.value,
+            ]);
+            let newSpec = selected.reduce((s, [facet_id, term]) => {
+              s[facet_id] = s[facet_id] || [];
+              s[facet_id].push(term);
+              return s;
+            }, {} as { [facet_id: string]: string[] });
+            setSpec(newSpec);
+          }}
+        />
+
+        <div className="d-flex justify-content-between gap-2">
+          {searchResult.facets.map((f) => {
+            let options = f.term_buckets.map((tb) => ({
+              value: tb.term,
+              label: `${tb.term} (${tb.count})`,
+            }));
+            return (
+              <div className="flex-grow-1" key={f.facet_id}>
+                {f.name}
+                <Select
+                  isMulti
+                  value={options.filter(
+                    ({ value }) =>
+                      f.facet_id in spec && spec[f.facet_id].indexOf(value) > -1
+                  )}
+                  name={f.facet_id}
+                  options={options}
+                  onChange={(e) => {
+                    setSpec({
+                      ...spec,
+                      [f.facet_id]: Array.from(e.values(), (v) => v.value),
+                    });
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
-      */}
+
         <div className="row">
           <div className="col-5">
             {searchResult.facets.map((f) => (
-              <div>
+              <div key={f.facet_id}>
                 {f.name}
                 <div>
                   {f.term_buckets.map((tb) => (
                     <div
+                      key={tb.term}
                       style={{
                         cursor: "pointer",
                       }}
@@ -130,7 +165,7 @@ export default ({
           <div className="col-7">
             <div className="list-group">
               {searchResult.records.map((v: Voice) => (
-                <label className="list-group-item">
+                <label className="list-group-item" key={v.id}>
                   <div>
                     <input
                       type="radio"

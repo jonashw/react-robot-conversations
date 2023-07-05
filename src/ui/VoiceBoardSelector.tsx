@@ -22,7 +22,7 @@ export default ({
     <>
       <div className="list-group" style={{ paddingBottom: "4em" }}>
         {voiceBoards.map((vb) => (
-          <Link className="list-group-item" to={sketchUrl(vb)}>
+          <Link className="list-group-item" to={sketchUrl(vb)} key={vb.id}>
             {vb.name}
             <span className="float-end text-muted text-sm">{vb.type}</span>
           </Link>
