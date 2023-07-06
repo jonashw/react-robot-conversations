@@ -30,7 +30,7 @@ export default function <T extends HasUniqueIdentifier>({
 }: {
   items: T[];
   setItems: (items: T[]) => void;
-  getItemLabel: (item: T) => string;
+  getItemLabel: (item: T, i: number) => React.ReactNode;
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -48,9 +48,9 @@ export default function <T extends HasUniqueIdentifier>({
     >
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         <div className="list-group">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <SortableListGroupItem key={item.id} id={item.id}>
-              {getItemLabel(item)}
+              {getItemLabel(item, i)}
             </SortableListGroupItem>
           ))}
         </div>

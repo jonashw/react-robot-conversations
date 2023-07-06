@@ -1,6 +1,7 @@
 import React from "react";
 import { VoiceIndex, Simple, Voice } from "../Model";
 import VoiceSelectorModal from "./VoiceSelectorModal";
+import SortableListGroup from "../ui/SortableListGroup";
 
 export default ({
   simple,
@@ -45,11 +46,16 @@ export default ({
           <tr>
             <th>Phrase(s)</th>
             <td>
-              {sketch.phrases.map((p, i) => (
-                <div key={i}>
+              <SortableListGroup
+                items={sketch.phrases.map((p) => ({ id: p }))}
+                setItems={(items) =>
+                  setSketch({ ...sketch, phrases: items.map((i) => i.id) })
+                }
+                getItemLabel={(pi, i) => (
                   <input
                     type="text"
-                    defaultValue={p}
+                    className="form-control"
+                    defaultValue={pi.id}
                     onChange={(e) => {
                       let s = {
                         ...sketch,
@@ -61,8 +67,8 @@ export default ({
                       onEdit(s);
                     }}
                   />
-                </div>
-              ))}
+                )}
+              />
             </td>
           </tr>
         </tbody>
