@@ -4,15 +4,14 @@ import VoiceSelectorModal from "./VoiceSelectorModal";
 import SortableListGroup from "../ui/SortableListGroup";
 
 export default ({
-  simple,
+  sketch,
   voiceIndex,
-  onEdit,
+  setSketch,
 }: {
-  simple: Simple;
+  sketch: Simple;
   voiceIndex: VoiceIndex;
-  onEdit: (s: Simple) => void;
+  setSketch: (s: Simple) => void;
 }) => {
-  const [sketch, setSketch] = React.useState(simple);
   const [voiceSelectorModalShown, setVoiceSelectorModalShown] =
     React.useState(false);
   return (
@@ -25,7 +24,6 @@ export default ({
         onVoiceSelect={(v: Voice) => {
           let s = { ...sketch, voice: v };
           setSketch(s);
-          onEdit(s);
         }}
       />
       <table className="table">
@@ -46,6 +44,25 @@ export default ({
           <tr>
             <th>Phrase(s)</th>
             <td>
+              {sketch.phrases.map((p, i) => (
+                <input
+                  type="text"
+                  className="form-control"
+                  defaultValue={p}
+                  onBlur={(e) => {
+                    if (e.target.value === p) {
+                      return;
+                    }
+                    let s = {
+                      ...sketch,
+                      phrases: sketch.phrases.map((pp, ii) =>
+                        i === ii ? e.target.value : pp
+                      ),
+                    };
+                    setSketch(s);
+                  }}
+                />
+              ))}
               <SortableListGroup
                 items={sketch.phrases.map((p) => ({ id: p }))}
                 setItems={(items) =>
@@ -53,6 +70,8 @@ export default ({
                 }
                 getItemLabel={(pi, i) => (
                   <input
+                    onClick={() => false}
+                    onMouseDown={() => false}
                     type="text"
                     className="form-control"
                     defaultValue={pi.id}
@@ -64,7 +83,7 @@ export default ({
                         ),
                       };
                       setSketch(s);
-                      onEdit(s);
+                      //onEdit(s);
                     }}
                   />
                 )}
