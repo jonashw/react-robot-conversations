@@ -20,7 +20,7 @@ export function VoiceSelectorDemoRoute() {
       setShown={(s) => {}}
       shown={true}
       voiceIndex={voiceIndex}
-      forceFilterMenuOpen={true}
+      forceFilterMenuOpen={false}
     />
   );
 }

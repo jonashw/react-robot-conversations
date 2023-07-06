@@ -17,6 +17,7 @@ export default ({
   return (
     <>
       <VoiceSelectorModal
+        defaultSelected={sketch.voice}
         voiceIndex={voiceIndex}
         shown={voiceSelectorModalShown}
         setShown={setVoiceSelectorModalShown}

@@ -3,6 +3,7 @@ import React from "react";
 import { FacetedSpecification, VoiceIndex, Voice } from "../Model";
 import Select from "react-select";
 import "../ui/react-select.scss";
+import AudioOutput from "../AudioOutput";
 const TermBadge = ({
   term,
   count,
@@ -26,17 +27,19 @@ export default ({
   shown,
   setShown,
   forceFilterMenuOpen,
+  defaultSelected,
 }: {
   voiceIndex: VoiceIndex;
   onVoiceSelect: (v: Voice) => void;
   shown: boolean;
   setShown: (s: boolean) => void;
   forceFilterMenuOpen?: boolean;
+  defaultSelected?: Voice;
 }) => {
   const [spec, setSpec] = React.useState<FacetedSpecification>({});
   let searchResult = voiceIndex.facetedSearch(spec);
   const [selectedVoice, setSelectedVoice] = React.useState<Voice | undefined>(
-    undefined
+    defaultSelected
   );
   const setSelectedVoiceById = (id: string) => {
     let v = voiceIndex.getAll().filter((v) => v.id === id)[0];
@@ -54,6 +57,7 @@ export default ({
       facet_id: tb.facet_id,
     })),
   }));
+  const testPhrase = "A B C 1 2 3";
 
   return (
     <Modal
@@ -118,16 +122,29 @@ export default ({
         <div className="list-group">
           {searchResult.records.map((v: Voice) => (
             <label className="list-group-item" key={v.id}>
-              <div className="d-flex justify-content-start align-items-baseline">
+              <div className="d-flex align-items-baseline">
                 <input
                   type="radio"
                   name="voice_id"
                   value={v.id}
                   onChange={(e) => setSelectedVoiceById(e.target.value)}
                 />
-                <div className="ps-2">
-                  {v.name}
+                <div className="ps-2 flex-grow-1">
                   <div className="d-flex justify-content-between">
+                    <span>{v.name}</span>
+
+                    <button
+                      className="btn btn-primary"
+                      onClick={(e) => {
+                        AudioOutput.play([v.name, testPhrase]);
+                        return false;
+                      }}
+                    >
+                      <img src="/icons/play.svg" style={{ height: "1em" }} />
+                    </button>
+                  </div>
+
+                  <div className="gap-2">
                     <TermBadge
                       term={v.gender}
                       active={

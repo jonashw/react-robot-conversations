@@ -114,7 +114,17 @@ export class VoiceIndex {
           getTermsFromRecord: (r) => [r.lang],
         },
       },
-      facet_term_parents: {},
+      facet_term_parents: {
+        /*
+        lang: {
+          "Indian English": "English",
+          "US English": "English",
+          "British English": "English",
+          "Welsh English": "English",
+          "Australian English": "English",
+        },
+        */
+      },
     });
   }
   getById(id: string): Voice {
