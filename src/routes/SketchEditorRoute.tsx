@@ -73,7 +73,9 @@ export function SketchEditorRoute() {
         const effects = new ConversationSideEffects(
           voiceIndex,
           conversation,
-          (p, n) => {}
+          (p, n) => {
+            setSketchRevisions(sketchRevisions.add(n));
+          }
         );
         return (
           <ConversationEditor
