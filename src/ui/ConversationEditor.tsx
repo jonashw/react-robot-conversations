@@ -9,6 +9,7 @@ import {
 import ConversationAudio from "../ConversationAudio";
 import ConversationSideEffects from "./ConversationSideEffects";
 import AudioOutput from "../AudioOutput";
+import VoiceSelectorModal from "../routes/VoiceSelectorModal";
 
 export default ({
   voiceIndex,
@@ -24,7 +25,10 @@ export default ({
   effect: ConversationSideEffects;
 }) => {
   let characterIds = Object.keys(conversation.characters);
-
+  let [
+    voiceSelectorModalShownByCharacterId,
+    setVoiceSelectorModalShownByCharacterId,
+  ] = React.useState(Object.fromEntries(characterIds.map((c) => [c, false])));
   return (
     <div>
       <input
@@ -127,20 +131,36 @@ export default ({
             <td>&nbsp;</td>
             {Object.entries(conversation.characters).map(([c, character]) => (
               <td key={character.name}>
-                <select
-                  className="form-control"
-                  defaultValue={character.voice}
-                  onChange={(e) =>
-                    effect.updateCharacter(c, {
-                      ...character,
-                      voice: e.target.value,
+                <VoiceSelectorModal
+                  defaultSelected={voiceIndex.getById(character.voice)}
+                  shown={voiceSelectorModalShownByCharacterId[c]}
+                  setShown={(s) =>
+                    setVoiceSelectorModalShownByCharacterId({
+                      ...voiceSelectorModalShownByCharacterId,
+                      [c]: s,
                     })
                   }
-                >
-                  {voiceIndex.getAll().map((v) => (
-                    <option value={v.name}>{v.name}</option>
-                  ))}
-                </select>
+                  voiceIndex={voiceIndex}
+                  onVoiceSelect={(v) => {
+                    effect.updateCharacter(c, {
+                      ...character,
+                      voice: v.name,
+                    });
+                  }}
+                />
+                <div className="d-grid">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      setVoiceSelectorModalShownByCharacterId({
+                        ...voiceSelectorModalShownByCharacterId,
+                        [c]: true,
+                      })
+                    }
+                  >
+                    {character.voice}
+                  </button>
+                </div>
               </td>
             ))}
             <td>&nbsp;</td>
